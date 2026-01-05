@@ -221,17 +221,20 @@
     }
 /* 📱 모바일 최적화 레이아웃 */
     @media (max-width: 768px) {
-      body { 
-        flex-direction: column; /* 사이드바를 위로, 메인을 아래로 배치 */
+body { 
+        flex-direction: column; 
+        overflow-y: auto; /* 🚨 이 줄을 추가하면 스크롤이 살아납니다! */
+        height: auto;
       }
-      
-      aside { 
+
+        aside { 
         width: 100%; 
         height: auto; 
         border-right: none; 
         border-bottom: 1px solid var(--border); 
         padding: 15px; 
         flex-shrink: 0; 
+        position: relative; /* 위치 고정 해제 */
       }
 
       .nav { 
@@ -251,15 +254,25 @@
       }
 
       header { 
-        justify-content: center; 
-        height: 50px; 
-        font-size: 14px; 
-        position: sticky;
-        top: 0;
+        position: relative;
+        width: 100%;
+        height: 56px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--accent);
+      }
+
+        main {
+        margin-top: 0;
+        display: block;
+        overflow: visible;
       }
 
       .home { 
-        margin-top: -80px; /* 기존보다 더 과감하게 위로 올림 */
+        margin-top: 100px; /* 기존보다 더 과감하게 위로 올림 */
       }
 
       .content { 
@@ -295,6 +308,7 @@
         font-size: 22px;
         margin-top: 0;   /* 제목 위쪽 여백 제거 */
         margin-bottom: 20px;
+      }
       }
     }
   </style>
