@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRACK ARCHIVE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #111214;
+      --panel: #16181d;
+      --panel-soft: #1c1f26;
+      --accent: #4f7cff;
+      --accent-soft: rgba(79,124,255,0.15);
+      --text: #eaeaf0;
+      --muted: #9aa0b4;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Montserrat", "Noto Sans KR", system-ui, sans-serif;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 🔹 전체 배경 그라데이션 (좌우 안 잘림) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(235,235,235,0.18) 0%,
+        rgba(235,235,235,0.08) 30%,
+        rgba(235,235,235,0.0) 60%
+      );
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Sidebar */
+    aside {
+      width: 260px;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 1;
+    }
+
+    .site-title {
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      font-size: 18px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav button {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text);
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .nav button:hover {
+      background: var(--panel-soft);
+      border-color: var(--border);
+    }
+
+    /* Main */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-top: 56px;
+    }
+
+    header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      background: var(--panel);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    /* Home */
+    .home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .crack-title {
+      text-align: center;
+    }
+
+    .crack-title h1 {
+      margin: 0;
+      font-size: 64px;
+      letter-spacing: 0.22em;
+      font-weight: 700;
+    }
+
+    .crack-title .c { color: var(--accent); }
+    .crack-title .w { color: var(--text); }
+
+    .crack-line {
+      margin: 18px auto 0;
+      width: 260px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* World view */
+    .world-view {
+      display: none;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .world-box {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      background: var(--panel);
+    }
+
+    .world-view h2 {
+      font-size: 28px;
+      margin-bottom: 24px;
+      letter-spacing: 0.12em;
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .sub {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      background: var(--panel);
+    }
+
+    .sub h3 {
+      margin-top: 0;
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+    }
+
+    .sub ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .sub a {
+      display: block;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .sub a:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <aside>
+    <div class="site-title">WORLD</div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+
+  <main>
+    <header>CRACK ARCHIVE</header>
+
+    <section class="content">
+      <div class="home" id="home">
+        <div class="crack-title">
+          <h1><span class="c">C</span>RACK AR<span class="c">C</span>HIVE</h1>
+          <div class="crack-line"></div>
+        </div>
+      </div>
+
+      <div class="world-view" id="worldView"></div>
+    </section>
+  </main>
+
+  <script>
+    const worlds = [
+      "마키나 게임","애완 인간","황궁의 꽃","성대한 집착","머메이드",
+      "환계 이동기","하이틴 에이지","구룡성채","수인 쉐어하우스",
+      "남고 생활기","중세 11년","ETC"
+    ];
+
+    const nav = document.getElementById('nav');
+    const home = document.getElementById('home');
+    const view = document.getElementById('worldView');
+
+    worlds.forEach(name => {
+      const btn = document.createElement('button');
+      btn.textContent = name;
+      btn.onclick = () => openWorld(name);
+      nav.appendChild(btn);
+    });
+
+    function openWorld(name) {
+      home.style.display = 'none';
+      view.style.display = 'block';
+
+      let storyItems = '<li><a href="#">페이지 추가 예정</a></li>';
+
+      if (name === '하이틴 에이지') {
+        storyItems = `
+          <li><a href="하이틴 에이지_bookmarks-darkmode.html">메인 루트</a></li>
+        `;
+      }
+
+      if (name === '성대한 집착') {
+        storyItems = `
+          <li><a href="성대한 집착_bookmarks-darkmode.html">메인 2</a></li>
+          <li><a href="성대한집착1_fixed.html">메인 3</a></li>
+        `;
+      }
+
+      if (name === '구룡성채') {
+        storyItems = `
+          <li><a href="구룡성채-아이작 회귀.html" target="_blank">아이작 회귀</a></li>
+          <li><a href="구룡성채_리처드루트.html" target="_blank">리처드 루트</a></li>
+        `;
+      }
+
+      view.innerHTML = `
+        <div class="world-box">
+          <h2>${name}</h2>
+          <div class="subgrid">
+            <div class="sub">
+              <h3>STORY</h3>
+              <ul>${storyItems}</ul>
+            </div>
+            <div class="sub">
+              <h3>BURNER</h3>
+              <ul>
+                <li><a href="#">페이지 추가 예정</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+
+</body>
+</html>
