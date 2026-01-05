@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>CRACK ARCHIVE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -21,235 +21,203 @@
       --border: rgba(255,255,255,0.08);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: "Montserrat", "Noto Sans KR", sans-serif;
+      font-family: "Montserrat", "Noto Sans KR", system-ui, sans-serif;
       height: 100vh;
       display: flex;
-      flex-direction: row; /* 기본 가로 배치 */
       overflow: hidden;
+      position: relative;
     }
 
-    /* 배경 그라데이션 */
+    /* 🔹 전체 배경 그라데이션 (좌우 안 잘림) */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      background: linear-gradient(to top, rgba(79,124,255,0.05) 0%, transparent 100%);
+      background: linear-gradient(
+        to top,
+        rgba(235,235,235,0.18) 0%,
+        rgba(235,235,235,0.08) 30%,
+        rgba(235,235,235,0.0) 60%
+      );
       z-index: 0;
       pointer-events: none;
     }
 
-    /* 사이드바 (모바일 대응) */
+    /* Sidebar */
     aside {
       width: 260px;
       background: var(--panel);
       border-right: 1px solid var(--border);
-      padding: 24px 16px;
+      padding: 24px 18px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      z-index: 10;
-      overflow-y: auto;
+      gap: 18px;
+      z-index: 1;
     }
 
     .site-title {
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
       font-size: 18px;
-      padding-left: 8px;
-      color: var(--accent);
     }
 
     .nav {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .nav button {
       background: transparent;
       border: 1px solid transparent;
-      color: var(--muted);
+      color: var(--text);
       text-align: left;
-      padding: 12px 14px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
-      transition: 0.2s;
-      white-space: nowrap;
     }
 
-    .nav button:hover, .nav button.active {
+    .nav button:hover {
       background: var(--panel-soft);
-      color: var(--text);
       border-color: var(--border);
     }
 
-    /* 메인 영역 */
+    /* Main */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow-y: auto;
+      margin-top: 56px;
     }
 
     header {
-      height: 60px;
-      min-height: 60px;
+      height: 56px;
       display: flex;
       align-items: center;
-      padding: 0 24px;
+      padding: 0 20px;
       border-bottom: 1px solid var(--border);
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      background: rgba(22, 24, 29, 0.8);
-      backdrop-filter: blur(10px);
-      position: sticky;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      background: var(--panel);
+      position: fixed;
       top: 0;
-      z-index: 20;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      color: var(--accent);
     }
 
     .content {
-      padding: 24px;
+      flex: 1;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: calc(100vh - 60px);
-    }
-
-    /* 홈 타이틀 화면 */
-    .home {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-top: 15vh;
+      padding: 40px;
+    }
+
+    /* Home */
+    .home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .crack-title {
       text-align: center;
     }
 
     .crack-title h1 {
       margin: 0;
-      font-size: clamp(32px, 8vw, 64px); /* 화면 크기에 따라 폰트 크기 자동 조절 */
-      letter-spacing: 0.15em;
-      font-weight: 800;
+      font-size: 64px;
+      letter-spacing: 0.22em;
+      font-weight: 700;
     }
 
     .crack-title .c { color: var(--accent); }
+    .crack-title .w { color: var(--text); }
 
     .crack-line {
-      margin: 20px auto;
-      width: 100px;
-      height: 4px;
+      margin: 18px auto 0;
+      width: 260px;
+      height: 3px;
       background: var(--accent);
       border-radius: 2px;
     }
 
-    /* 월드 상세 뷰 */
+    /* World view */
     .world-view {
       display: none;
       width: 100%;
-      max-width: 800px;
-      animation: fadeIn 0.4s ease-out;
+      max-width: 1000px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .world-box {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      background: var(--panel);
     }
 
-    .world-box h2 {
+    .world-view h2 {
       font-size: 28px;
-      margin-bottom: 30px;
-      border-left: 5px solid var(--accent);
-      padding-left: 15px;
+      margin-bottom: 24px;
+      letter-spacing: 0.12em;
     }
 
     .subgrid {
       display: grid;
-      grid-template-columns: 1fr; /* 기본 1줄 (모바일) */
-      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
     }
 
     .sub {
-      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 18px;
+      background: var(--panel);
     }
 
     .sub h3 {
-      margin: 0 0 15px 0;
-      font-size: 14px;
-      letter-spacing: 0.1em;
+      margin-top: 0;
+      font-size: 15px;
+      letter-spacing: 0.18em;
       color: var(--accent);
-      text-transform: uppercase;
     }
 
     .sub ul {
       list-style: none;
       padding: 0;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
     }
 
     .sub a {
       display: block;
       background: var(--panel-soft);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 8px;
+      padding: 14px;
       text-decoration: none;
       color: var(--text);
-      font-size: 15px;
-      transition: 0.2s;
+      font-size: 14px;
+      text-align: center;
     }
 
-    .sub a:active { transform: scale(0.98); }
-
-    /* 📱 모바일 화면 최적화 (768px 이하) */
-    @media (max-width: 768px) {
-      body { flex-direction: column; } /* 세로로 배치 */
-
-      aside {
-        width: 100%;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        padding: 15px;
-      }
-
-      .nav {
-        flex-direction: row; /* 메뉴를 가로로 배치 */
-        overflow-x: auto; /* 좌우 스크롤 가능하게 */
-        padding-bottom: 5px;
-      }
-
-      .nav button {
-        padding: 8px 15px;
-        font-size: 13px;
-      }
-
-      header {
-        font-size: 14px;
-        justify-content: center;
-      }
-
-      .content { padding: 15px; }
-
-      .crack-title h1 { font-size: 36px; }
-    }
-
-    /* 🖥️ 데스크탑 이상에서는 2열로 */
-    @media (min-width: 900px) {
-      .subgrid { grid-template-columns: 1fr 1fr; }
+    .sub a:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
     }
   </style>
 </head>
@@ -289,36 +257,75 @@
     worlds.forEach(name => {
       const btn = document.createElement('button');
       btn.textContent = name;
-      btn.onclick = (e) => {
-        // 활성화 버튼 표시
-        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        openWorld(name);
-      };
+      btn.onclick = () => openWorld(name);
       nav.appendChild(btn);
     });
-
-    function openWorld(name) {
+function openWorld(name) {
       home.style.display = 'none';
       view.style.display = 'block';
-      // 클릭 시 본문 상단으로 스크롤
-      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       let storyItems = '<li><a href="#">페이지 추가 예정</a></li>';
+      let burnerItems = '<li><a href="#">페이지 추가 예정</a></li>';
 
       if (name === '하이틴 에이지') {
         storyItems = `<li><a href="하이틴 에이지_bookmarks-darkmode.html">메인 루트</a></li>`;
-      }
-      if (name === '성대한 집착') {
+        burnerItems = `
+          <li><a href="니콜 카톡-me.html">니콜 카톡</a></li>
+          <li><a href="니콜 인스타(업글버전).html">니콜 인스타</a></li>
+          <li><a href="하이틴 다인 당근마켓.html">당근마켓</a></li>
+          <li><a href="하이틴 낙서장.html">낙서장</a></li>
+          <li><a href="앤디 당근마켓.html">앤디 당근마켓</a></li>
+          <li><a href="레이먼 나무위키.html">레이먼 나무위키</a></li>
+        `;
+      } else if (name === '성대한 집착') {
         storyItems = `
           <li><a href="성대한 집착_bookmarks-darkmode.html">메인 2</a></li>
           <li><a href="성대한집착1_fixed.html">메인 3</a></li>
         `;
-      }
-      if (name === '구룡성채') {
+        burnerItems = `
+          <li><a href="제이드 폰.html">제이드 폰</a></li>
+          <li><a href="오웬 휴대폰.html">오웬 폰</a></li>
+          <li><a href="제이드 카톡.html">제이드 카톡</a></li>
+          <li><a href="제이드 썸원.html">제이드 썸원</a></li>
+          <li><a href="제이드 당근마켓.html">제이드 당근마켓</a></li>
+        `;
+      } else if (name === '황궁의 꽃') {
+        burnerItems = `
+          <li><a href="리브론 커플 데이트 체크리스트.html">커플 데이트 체크리스트</a></li>
+          <li><a href="리브론 커플 tmi 체크리스트.html">커플 tmi 체크리스트</a></li>
+          <li><a href="리브론 커플 19 체크리스트.html">커플 19 체크리스트</a></li>
+          <li><a href="리브론 연인간 짜증나는 상황 월드컵.html">연인간 짜증나는 상황 월드컵</a></li>
+          <li><a href="리브론 스팀페이지.html">스팀페이지</a></li>
+          <li><a href="리브론 다마고치.html">리브론 다마고치</a></li>
+        `;
+      } else if (name === '구룡성채') {
         storyItems = `
           <li><a href="구룡성채-아이작 회귀.html" target="_blank">아이작 회귀</a></li>
           <li><a href="구룡성채_리처드루트.html" target="_blank">리처드 루트</a></li>
+        `;
+        burnerItems = `
+          <li><a href="아이작 휴대폰.html">아이작 폰</a></li>
+          <li><a href="아이작 회귀 썸원.html">아이작 회귀 썸원</a></li>
+          <li><a href="아이작 회귀 스팀페이지.html">아이작 회귀 스팀페이지</a></li>
+          <li><a href="아이작 커플데이트 체크리스트.html">아이작 커플데이트</a></li>
+          <li><a href="아이작 커플 tmi.html">아이작 커플 tmi</a></li>
+          <li><a href="아이작 커플 tmi 체크리스트2.html">아이작 커플 tmi2</a></li>
+          <li><a href="아이작 썸원.html">아이작 썸원</a></li>
+          <li><a href="아이작 스팀페이지.html">아이작 스팀페이지</a></li>
+          <li><a href="요한 휴대폰.html">요한 폰</a></li>
+          <li><a href="요한 넷플릭스.html">요한 넷플</a></li>
+        `;
+      } else if (name === '수인 쉐어하우스') {
+        burnerItems = `
+          <li><a href="백호현 휴대폰.html">백호현 폰</a></li>
+          <li><a href="도윤서 휴대폰.html">도윤서 폰</a></li>
+          <li><a href="도윤서 카톡.html">도윤서 카톡</a></li>
+          <li><a href="도윤서 에타.html">도윤서 에타</a></li>
+        `;
+      } else if (name === 'ETC') {
+        burnerItems = `
+          <li><a href="류월 휴대폰.html">류월 폰</a></li>
+          <li><a href="기도현 휴대폰.html">기도현 폰</a></li>
         `;
       }
 
@@ -332,15 +339,12 @@
             </div>
             <div class="sub">
               <h3>BURNER</h3>
-              <ul>
-                <li><a href="#">페이지 추가 예정</a></li>
-              </ul>
+              <ul>${burnerItems}</ul>
             </div>
           </div>
         </div>
       `;
     }
   </script>
-
 </body>
 </html>
