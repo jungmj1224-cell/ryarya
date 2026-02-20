@@ -337,7 +337,7 @@ body {
 
   <script>
     const worlds = [
-      "마키나 게임","애완 인간","황궁의 꽃","성대한 집착","머메이드",
+      "도재언","마키나 게임","애완 인간","황궁의 꽃","성대한 집착","머메이드",
       "환계 이동기","하이틴 에이지","구룡성채","수인 쉐어하우스",
       "남고 생활기","중세 11년","ETC"
     ];
@@ -412,13 +412,29 @@ function openWorld(name) {
           <li><a href="요한 넷플릭스.html">요한 넷플</a></li>
         `;
       } else if (name === '수인 쉐어하우스') {
+        storyItems = `
+          <li><a href="수인 웨어하우스 02-20.html">도윤서 루트</a></li>
         burnerItems = `
           <li><a href="백호현 휴대폰.html">백호현 폰</a></li>
           <li><a href="도윤서 휴대폰.html">도윤서 폰</a></li>
           <li><a href="도윤서 카톡.html">도윤서 카톡</a></li>
           <li><a href="도윤서 에타.html">도윤서 에타</a></li>
         `;
+      } else if (name === '애완 인간') {
+        storyItems = `
+          <li><a href="애완인간 02-20.html">메인</a></li>
+        `;
+      } else if (name === '도재언') {
+        storyItems = `
+          <li><a href="도재언 02-20.html">메인</a></li>
+        `;
+      } else if (name === '마키나 게임') {
+        storyItems = `
+          <li><a href="마키나 게임 02-20.html">메인</a></li>
+        `;
       } else if (name === 'ETC') {
+        storyItems = `
+          <li><a href="잊고 잃어버린 신님 02-20.html">잊고 잃어버린 신님</a></li>
         burnerItems = `
           <li><a href="기도현 휴대폰.html">기도현 폰</a></li>
         `;
