@@ -336,7 +336,7 @@ body {
   </main>
 
   <script>
-    const worlds = [
+   const worlds = [
       "도재언","마키나 게임","애완 인간","황궁의 꽃","성대한 집착","머메이드",
       "환계 이동기","하이틴 에이지","구룡성채","수인 쉐어하우스",
       "남고 생활기","중세 11년","ETC"
@@ -352,7 +352,8 @@ body {
       btn.onclick = () => openWorld(name);
       nav.appendChild(btn);
     });
-function openWorld(name) {
+
+    function openWorld(name) {
       home.style.display = 'none';
       view.style.display = 'block';
 
@@ -386,6 +387,7 @@ function openWorld(name) {
           <li><a href="황궁의 꽃 1.html">메인 1</a></li>
           <li><a href="황궁의 꽃 2.html">메인 2</a></li>
           <li><a href="황궁의 꽃 2.html">메인 3</a></li>
+        `; // 👈 이 닫는 기호들이 빠져 있었습니다.
         burnerItems = `
           <li><a href="리브론 커플 데이트 체크리스트.html">커플 데이트 체크리스트</a></li>
           <li><a href="리브론 커플 tmi 체크리스트.html">커플 tmi 체크리스트</a></li>
@@ -419,6 +421,7 @@ function openWorld(name) {
       } else if (name === '수인 쉐어하우스') {
         storyItems = `
           <li><a href="수인 웨어하우스 02-20.html">도윤서 루트</a></li>
+        `; // 👈 닫는 기호 추가
         burnerItems = `
           <li><a href="백호현 휴대폰.html">백호현 폰</a></li>
           <li><a href="도윤서 휴대폰.html">도윤서 폰</a></li>
@@ -442,6 +445,7 @@ function openWorld(name) {
           <li><a href="잊고 잃어버린 신님 02-20.html">잊고 잃어버린 신님</a></li>
           <li><a href="내 혈육의 친구.html">내 혈육의 친구</a></li>
           <li><a href="머메이드 02-20.html">머메이드</a></li>
+        `; // 👈 닫는 기호 추가
         burnerItems = `
           <li><a href="기도현 휴대폰.html">기도현 폰</a></li>
         `;
