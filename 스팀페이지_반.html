@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Store Simulation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        :root {
+            --steam-dark-blue: #1b2838;
+            --steam-medium-blue: #2a475e;
+            --steam-light-blue: #66c0f4;
+            --steam-grey: #c7d5e0;
+            --steam-dark-grey: #8f98a0;
+            --steam-green: #719335;
+            --steam-red: #c23c2a;
+            --steam-black: #171a21;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--steam-black);
+            color: var(--steam-grey);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .steam-container {
+            width: 100%;
+            max-width: 940px;
+            background-color: var(--steam-dark-blue);
+            border-radius: 4px;
+        }
+
+        .steam-header {
+            background-color: var(--steam-black);
+            padding: 10px 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-button {
+            background: linear-gradient(to bottom, #4a7495 5%, #3c5d76 95%);
+            border: 1px solid #1e3d51;
+            padding: 8px 15px;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .nav-button:hover {
+            background: linear-gradient(to bottom, #5e8aa9 5%, #4b708a 95%);
+        }
+
+        .steam-main-content {
+            padding: 20px;
+        }
+
+        #main-store-page, #community-hub-page {
+            display: none;
+        }
+        
+        #main-store-page.active, #community-hub-page.active {
+            display: block;
+        }
+
+        .game-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .game-title-bar h1 {
+            color: white;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .top-section {
+            display: flex;
+            gap: 20px;
+            height: 380px;
+        }
+
+        .carousel-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-media {
+            flex-grow: 1;
+            background-color: #000;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+        .main-media-description {
+            font-size: 16px;
+            color: white;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 5px;
+            background-color: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        .timeline-progress {
+            width: 0%;
+            height: 100%;
+            background-color: var(--steam-light-blue);
+            border-radius: 3px;
+            animation: play-trailer 15s linear infinite;
+        }
+
+        @keyframes play-trailer {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .thumbnail-reel {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .thumbnail {
+            min-width: 100px;
+            height: 60px;
+            background-color: #000;
+            border: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 3px;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            border-color: var(--steam-light-blue);
+        }
+
+        .game-widget {
+            flex: 1;
+            background-color: var(--steam-medium-blue);
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .widget-art {
+            width: 100%;
+            height: 120px;
+            background-color: #1a2c3b;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+            color: var(--steam-dark-grey);
+        }
+
+        .widget-description {
+            font-size: 13px;
+            color: var(--steam-grey);
+            margin-bottom: 15px;
+        }
+        .widget-reviews {
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .widget-reviews strong {
+            color: var(--steam-light-blue);
+        }
+        .widget-tags {
+            margin-bottom: 15px;
+        }
+        .tag {
+            background-color: #3e5f7a;
+            color: var(--steam-light-blue);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .widget-details p {
+            font-size: 12px;
+            margin: 5px 0;
+            color: var(--steam-dark-grey);
+        }
+        .widget-details strong {
+            color: var(--steam-grey);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 18px;
+            margin-top: 30px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--steam-medium-blue);
+        }
+
+        .about-game {
+            background-color: var(--steam-medium-blue);
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .reviews-section {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .reviews-list-container {
+            flex: 3;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--steam-medium-blue);
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .review-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+        }
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .review-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1a2c3b;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .review-author-info {
+            flex-grow: 1;
+        }
+        .review-author-name {
+            color: white;
+            font-weight: bold;
+        }
+        .review-playtime {
+            font-size: 11px;
+            color: var(--steam-dark-grey);
+        }
+        .recommendation-icon {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .recommendation-icon.recommended { color: var(--steam-light-blue); }
+        .recommendation-icon.not-recommended { color: var(--steam-red); }
+        .recommendation-icon span { font-size: 24px; margin-right: 5px; }
+
+        .review-body {
+            font-size: 13px;
+            line-height: 1.7;
+            padding-left: 50px;
+        }
+        
+        .community-hub-content {
+            background-color: var(--steam-medium-blue);
+            padding: 20px;
+            border-radius: 4px;
+        }
+        
+        .patch-notes, .guides-section, .achievements-section {
+            margin-bottom: 30px;
+        }
+        .patch-highlight {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 3px;
+            border-left: 3px solid var(--steam-light-blue);
+        }
+        .patch-highlight h3 { margin-top: 0; color: white; }
+        .patch-highlight ul { padding-left: 20px; }
+        .patch-highlight li { margin-bottom: 8px; }
+
+        .guide-item {
+            background-color: rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        .guide-header {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .guide-header:hover { background-color: rgba(0,0,0,0.3); }
+        .guide-title {
+            color: white;
+            font-weight: bold;
+        }
+        .guide-author {
+            font-size: 12px;
+            color: var(--steam-dark-grey);
+            display: flex;
+            align-items: center;
+        }
+        .guide-author .review-profile-pic { width: 24px; height: 24px; font-size: 14px; margin-right: 8px; }
+        .guide-content {
+            display: none;
+            padding: 0 15px 15px 15px;
+            border-top: 1px solid #3e5f7a;
+        }
+        .guide-content.open { display: block; }
+        .guide-text {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+        .guide-comments h4 { color: white; font-size: 14px; margin-top: 0;}
+        .comment {
+            font-size: 12px;
+            border-left: 2px solid var(--steam-dark-grey);
+            padding-left: 10px;
+            margin-bottom: 8px;
+        }
+        .comment-author { color: var(--steam-light-blue); }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .achievement-card {
+            background-color: rgba(0,0,0,0.3);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 3px;
+        }
+        .achievement-icon {
+            font-size: 32px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .achievement-details h4 {
+            margin: 0 0 5px 0;
+            color: white;
+            font-size: 14px;
+        }
+        .achievement-desc {
+            font-size: 12px;
+            color: var(--steam-dark-grey);
+        }
+        .achievement-rarity {
+            font-size: 10px;
+            color: var(--steam-light-blue);
+            margin-top: 5px;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="steam-container">
+    <header class="steam-header">
+        <span id="game-header-title">나의 작은 우주: My Little Cosmos</span>
+        <div>
+            <button class="nav-button" id="store-button">스토어 페이지</button>
+            <button class="nav-button" id="community-button">커뮤니티 허브</button>
+        </div>
+    </header>
+
+    <main class="steam-main-content">
+        <!-- 메인 스토어 페이지 -->
+        <div id="main-store-page">
+            <div class="game-title-bar">
+                <h1>나의 작은 우주: My Little Cosmos</h1>
+            </div>
+            <div class="top-section">
+                <div class="carousel-container">
+                    <div class="main-media">
+                        <div class="main-media-description">[트레일러 설명: 웅장한 우주를 배경으로 거대한 함선이 셀렌 행성에 착륙한다. 이어서 고급스러운 저택 내부. 반 에른하임이 선물 상자를 열자, 그 안에 웅크리고 있는 한우정의 겁에 질린 얼굴이 클로즈업된다. 장면이 전환되며 불꽃놀이를 배경으로 엎드려 있는 우정의 나신, '힐링 돔' 안에서 격렬하게 흔들리는 모습, 욕조에서 물고기 장난감에 의해 괴로워하는 모습이 몽환적인 음악과 함께 교차 편집된다. 마지막은 반이 잠든 우정을 품에 안고 "내 우주는, 너 하나로 충분해."라고 나지막이 속삭이는 장면으로 끝난다.]</div>
+                        <div class="timeline-bar"><div class="timeline-progress"></div></div>
+                    </div>
+                    <div class="thumbnail-reel">
+                        <div class="thumbnail active" data-type="trailer" data-description="[트레일러 설명: 웅장한 우주를 배경으로 거대한 함선이 셀렌 행성에 착륙한다. 이어서 고급스러운 저택 내부. 반 에른하임이 선물 상자를 열자, 그 안에 웅크리고 있는 한우정의 겁에 질린 얼굴이 클로즈업된다. 장면이 전환되며 불꽃놀이를 배경으로 엎드려 있는 우정의 나신, '힐링 돔' 안에서 격렬하게 흔들리는 모습, 욕조에서 물고기 장난감에 의해 괴로워하는 모습이 몽환적인 음악과 함께 교차 편집된다. 마지막은 반이 잠든 우정을 품에 안고 "내 우주는, 너 하나로 충분해."라고 나지막이 속삭이는 장면으로 끝난다.]">🎬</div>
+                        <div class="thumbnail" data-type="screenshot" data-description="[스크린샷 설명: 게임 플레이 UI. 좌측 상단에 한우정의 프로필과 함께 [상태: 불안], [스트레스: 78%], [애정도: 45%], [공포: 62%] 등의 수치가 표시되어 있다. 중앙에는 반의 시점에서 소파에 웅크리고 있는 우정의 모습이 보인다.]">🖼️</div>
+                        <div class="thumbnail" data-type="screenshot" data-description="[스크린샷 설명: 화려한 불꽃이 밤하늘을 수놓는 가운데, 텐트 앞 꽃밭에 엎드린 우정의 모습. 그의 등 위로 드리워진 반의 거대한 그림자가 위압적이면서도 보호적인 분위기를 자아낸다.]">🎆</div>
+                        <div class="thumbnail" data-type="screenshot" data-description="[스크린샷 설명: '힐링 돔' 안에 갇혀 쾌락과 고통에 몸부림치는 우정. 투명한 돔 너머로 태블릿을 조작하며 그를 지켜보는 반의 만족스러운 표정이 보인다.]">🛋️</div>
+                        <div class="thumbnail" data-type="screenshot" data-description="[스크린샷 설명: 넓은 욕조 안, 반의 품에 안겨 있는 우정. 그의 다리 사이로 헤엄쳐 들어가는 물고기 로봇의 모습이 보이며, 우정의 표정은 공포에 질려 있다.]">🛁</div>
+                        <div class="thumbnail" data-type="screenshot" data-description="[스크린샷 설명: 칼먼의 지하 놀이방. 공중에 구속된 록시의 모습과 그를 바라보며 겁에 질린 우정의 얼굴이 한 화면에 담겨 있다. 극명한 대비를 통해 세계관의 잔혹함을 암시한다.]">⛓️</div>
+                    </div>
+                </div>
+                <div class="game-widget">
+                    <div class="widget-art">[키 아트 설명: 거대한 반 에른하임의 손바닥 위에서 잠든 작은 한우정의 모습. 반의 손은 우주를 품은 듯 반짝이고, 우정은 그 안에서 평온하면서도 위태로워 보인다.]</div>
+                    <p class="widget-description">
+                        광활한 우주를 지배하는 기업 '오르빗'의 총수, 반 에른하임. 어느 날 당신의 손에 들어온 작고 연약한 선물, '한우정'. 그의 주인이 되어, 당신만의 방식으로 사랑을 가르쳐주세요.
+                    </p>
+                    <div class="widget-reviews">
+                        <strong>최근 평가:</strong> 압도적으로 긍정적 (2,134개) <br>
+                        <strong>모든 평가:</strong> 압도적으로 긍정적 (15,880개)
+                    </div>
+                    <div class="widget-tags">
+                        <span class="tag">성인</span>
+                        <span class="tag">시뮬레이션</span>
+                        <span class="tag">비주얼 노벨</span>
+                        <span class="tag">심리적 공포</span>
+                    </div>
+                    <div class="widget-details">
+                        <p><strong>출시일:</strong> 2065년 5월 2일</p>
+                        <p><strong>개발사:</strong> <span style="color: var(--steam-light-blue);">Studio Baekseol</span></p>
+                        <p><strong>배급사:</strong> <span style="color: var(--steam-light-blue);">ORBIT Entertainment</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">이 게임에 대해</h2>
+            <div class="about-game">
+                <strong>당신의 작은 우주를, 완벽한 사랑으로 채워주세요.</strong><br><br>
+                <p>플레이어는 우주 항로 기업 '오르빗'의 총수 '반 에른하임'이 되어, 어느 날 선물로 받게 된 애완인간 '한우정'을 돌보게 됩니다. 그의 모든 것을 관리하고, 당신만의 방식으로 '사랑'을 표현하며 그를 세상에서 가장 행복한 '아가'로 만들어주세요.</p>
+                <br>
+                <strong>주요 특징:</strong>
+                <ul>
+                    <li><strong>토탈 케어 시스템:</strong> 젖병 수유부터 배변 관리까지, 우정의 모든 생리 현상을 당신의 손으로 직접 통제하고 보살펴주세요. 그의 신체는 오직 당신의 것입니다.</li>
+                    <li><strong>첨단 '놀이' 기구:</strong> '힐링 돔', '자동 목마', '물고기 로봇' 등, 셀렌의 최첨단 기술력이 집약된 다양한 기구들을 통해 우정의 스트레스를 해소하고, 깊은 유대감을 형성하세요.</li>
+                    <li><strong>당신만의 양육 방식:</strong> 우정의 모든 반응은 당신의 선택에 따라 달라집니다. 다정한 '아빠'가 되어 오냐오냐 키울 수도, 엄격한 '주인'이 되어 복종을 가르칠 수도 있습니다. 그의 공포, 수치심, 쾌락... 그 모든 것은 당신의 사랑의 증거입니다.</li>
+                    <li><strong>위험한 외부 세계:</strong> 애완인간을 노리는 위험한 인물들과의 조우! 당신의 소유물을 지키기 위해 때로는 단호한 결단이 필요합니다. 당신의 품 안만이 유일한 안식처임을 각인시키세요.</li>
+                </ul>
+                <p style="font-size: 12px; color: var(--steam-dark-grey);">※ 본 게임은 성인 플레이어를 대상으로 하며, 강압적 관계, 비동의적 행위, 정신적 지배 등의 요소를 포함하고 있습니다. 플레이에 참고하시기 바랍니다.</p>
+            </div>
+            
+            <h2 class="section-title">사용자 평가</h2>
+            <div class="reviews-list-container">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">👑</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">우주아빠</div>
+                            <div class="review-playtime">플레이 시간: 152.3 시간</div>
+                        </div>
+                        <div class="recommendation-icon recommended"><span>👍</span> 추천</div>
+                    </div>
+                    <div class="review-body">
+                        이거 완전 육아 시뮬레이션이잖아요 ㅋㅋㅋ 우리 아가 밥 먹이고 씻기고 재우고... 떼쓸 때마다 달래주고... 너무 사랑스러워서 시간 가는 줄 모르겠습니다. 젖병 물고 오물거리는 거 보고 있으면 아빠 미소가 절로 나옴. 개발자분들, 우리 아가 옷 좀 더 많이 내주세요. 멜빵바지 입히니까 심장이 아픕니다.
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">😈</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">Calman_Enjoyer</div>
+                            <div class="review-playtime">플레이 시간: 88.1 시간</div>
+                        </div>
+                        <div class="recommendation-icon recommended"><span>👍</span> 추천</div>
+                    </div>
+                    <div class="review-body">
+                        반의 양육 방식은 너무 물러터졌음. 칼먼처럼 확실하게 서열 정리를 해줘야 진짜 애완동물이 되는 법인데. 그래도 기구 종류가 다양해서 좋네요. 힐링 돔 최고 속도로 돌리니까 애가 거의 정신을 못 차리던데 그 표정이 아주 일품입니다. 록시 같은 애도 공략 캐릭터로 추가해주면 안 되나요?
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">💧</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">과몰입러</div>
+                            <div class="review-playtime">플레이 시간: 204.5 시간</div>
+                        </div>
+                        <div class="recommendation-icon recommended"><span>👍</span> 추천</div>
+                    </div>
+                    <div class="review-body">
+                        이게 단순한 떡겜인 줄 알았는데... 하면 할수록 심리 스릴러네요. 반의 시점에서 플레이하니까 그의 모든 행동이 '사랑'으로 포장되는데, 우정이의 입장에서 보면 이건 그냥 감금 사육물이잖아요. 우정이가 바들바들 떨면서도 반의 손길에 결국 느끼는 모습 볼 때마다 죄책감이랑 정복감이 동시에 들어서 미치겠습니다. 개발자님... 혹시 우정이 시점 DLC 내주실 생각은 없으신가요? 제발요...
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">🔧</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">기구전문가</div>
+                            <div class="review-playtime">플레이 시간: 55.6 시간</div>
+                        </div>
+                        <div class="recommendation-icon recommended"><span>👍</span> 추천</div>
+                    </div>
+                    <div class="review-body">
+                        기구 디자인이 아주 마음에 듭니다. 특히 힐링 돔은 자세 고정부터 심층 자극까지 기능이 다양해서 활용도가 높네요. 다만 진동 패턴이 몇 개 없어서 아쉽습니다. 다음 업데이트 때는 랜덤 패턴이나 파도타기 같은 좀 더 다채로운 모드를 추가해주셨으면 합니다. 그리고 방수 기구 종류도 더 늘려주세요. 목욕 플레이가 꿀잼.
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">💢</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">말안듣는아가</div>
+                            <div class="review-playtime">플레이 시간: 31.2 시간</div>
+                        </div>
+                        <div class="recommendation-icon not-recommended"><span>👎</span> 비추천</div>
+                    </div>
+                    <div class="review-body">
+                        아니 우리 애가 싫다는데 왜 자꾸 만지는거임? 밥 먹는데 엉덩이는 왜 만져;;<br>
+                        자꾸 칭얼거려서 달래주려고 스탯 좋은 기구 썼더니 애가 울다가 사정하고 기절함. <br>
+                        내가 뭘 잘못한거냐? 아빠 되기 너무 힘드네... 환불합니다.
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-profile-pic">❤️</div>
+                        <div class="review-author-info">
+                            <div class="review-author-name">아가사랑해</div>
+                            <div class="review-playtime">플레이 시간: 310.8 시간</div>
+                        </div>
+                        <div class="recommendation-icon recommended"><span>👍</span> 추천</div>
+                    </div>
+                    <div class="review-body">
+                        우리 우정이가 너무 예뻐요. 병원 데려갔을 때 무서워서 파들파들 떠는데 그거 달래주느라 혼났네요. 검진 끝나고 힐링 젤 스틱 넣어주니까 금방 새근새근 잠드는 거 보고 진짜 아빠가 된 기분이었습니다. 이 게임은 사랑입니다. 우정아 아빠가 평생 지켜줄게.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 커뮤니티 허브 페이지 -->
+        <div id="community-hub-page">
+            <div class="community-hub-content">
+                <div class="patch-notes">
+                    <h2 class="section-title">최신 업데이트: Ver 1.08 "정밀 검진"</h2>
+                    <div class="patch-highlight">
+                        <h3>주요 하이라이트</h3>
+                        <ul>
+                            <li><strong>신규 이벤트 추가:</strong> '첫 종합 검진' 이벤트가 추가되었습니다. 애완인간의 건강 상태를 정밀하게 확인하고, 새로운 '의료용' 기구를 체험해볼 수 있습니다.</li>
+                            <li><strong>NPC 상호작용 심화:</strong> '칼먼 파이셀'의 저택 방문 이벤트가 추가되었습니다. 그의 독특한 '양육 방식'을 통해 새로운 교육법에 대한 힌트를 얻을 수 있습니다. (주의: 한우정의 '공포' 수치가 급격히 상승할 수 있습니다.)</li>
+                            <li><strong>밸런스 조정:</strong> '힐링 돔', '그네 의자' 등 일부 '놀이' 기구의 스트레스 해소 수치가 소폭 상향 조정되었습니다. 이제 더 효과적으로 '아가'의 기분을 풀어줄 수 있습니다.</li>
+                             <li><strong>품질 개선:</strong> '젖병 수유' 시 한우정의 표정과 반응이 더욱 다채롭게 개선되었습니다.</li>
+                            <li><strong>버그 수정:</strong> 식사 중 특정 상호작용 시 진동 기능이 비활성화되던 버그를 수정했습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guides-section">
+                    <h2 class="section-title">가이드</h2>
+                    <div class="guide-item" id="guide1">
+                        <div class="guide-header">
+                            <span class="guide-title">초보 아빠 필독! '한우정' 기본 케어 가이드</span>
+                            <span class="guide-author"><div class="review-profile-pic">👑</div>우주아빠</span>
+                        </div>
+                        <div class="guide-content">
+                            <div class="guide-text">안녕하세요, 이제 막 아빠가 되신 분들을 위해 작성합니다. 우리 우정이는 기본적으로 겁이 많고 예민한 아이입니다. 절대로 강압적으로 대하시면 안돼요! 항상 다정한 목소리로 '아가', '착하다' 같은 칭찬을 해주셔야 합니다. 밥은 젖병으로 주는 걸 가장 좋아하고, 목욕 후에는 꼭 보송보송하게 닦아주고 엉덩이 상태를 확인해주는 게 중요합니다. 붉게 부었다면 진정 젤을 발라주는 센스! 이것만 기억하시면 당신도 최고의 아빠가 될 수 있습니다.</div>
+                            <div class="guide-comments">
+                                <h4>댓글</h4>
+                                <div class="comment"><span class="comment-author">뉴비:</span> 와, 감사합니다. 맨날 울기만 해서 힘들었는데...</div>
+                                <div class="comment"><span class="comment-author">Calman_Enjoyer:</span> 너무 오냐오냐 키우는 거 아닙니까? ㅉㅉ</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-item" id="guide2">
+                        <div class="guide-header">
+                            <span class="guide-title">'힐링 돔' 200% 활용법 (feat. 사정 제어)</span>
+                            <span class="guide-author"><div class="review-profile-pic">🔧</div>기구전문가</span>
+                        </div>
+                        <div class="guide-content">
+                            <div class="guide-text">'힐링 돔'은 단순한 기구가 아닙니다. 과학이죠. 처음엔 '마사지-약' 모드로 긴장을 풀어준 뒤, '자세 조정-후배위'로 전환하는 것이 정석입니다. 이때 '온열 기능'을 켜주면 반응이 더 좋아집니다. 핵심은 '사정 방지 링'입니다. 링으로 막아둔 채 '심층 자극-스크류' 모드로 전립선을 계속 자극하면, 평소의 몇 배는 더 강한 절정을 맛보게 해줄 수 있습니다. 마지막에 링을 풀어줄 때의 그 표정, 놓치지 마세요.</div>
+                            <div class="guide-comments">
+                                <h4>댓글</h4>
+                                <div class="comment"><span class="comment-author">과몰입러:</span> 당신은 악마입니까...? (따라하며)</div>
+                                <div class="comment"><span class="comment-author">우주아빠:</span> 우리 아가한테 너무 과격한 거 아닌가요 ㅠㅠ</div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="guide-item" id="guide3">
+                        <div class="guide-header">
+                            <span class="guide-title">배변 훈련, 기저귀 떼기 완벽 공략</span>
+                            <span class="guide-author"><div class="review-profile-pic">🚽</div>쉬마스터</span>
+                        </div>
+                        <div class="guide-content">
+                            <div class="guide-text">다들 배변 훈련 때문에 고민 많으시죠. 핵심은 '신호 파악'과 '칭찬'입니다. 우정이가 다리를 꼬거나 칭얼거리면 그게 신호입니다. 바로 안아서 화장실로 데려가세요. 이때 "쉬-" 소리를 내주며 배를 살살 문질러주는 게 중요합니다. 성공하면 "우리 아가 착하다" 하면서 머리를 마구 쓰다듬어주세요. 절대 실수했다고 혼내면 안 됩니다! 트라우마 생겨요. 기저귀는 밤에만 채우는 것부터 시작합시다.</div>
+                            <div class="guide-comments">
+                                <h4>댓글</h4>
+                                <div class="comment"><span class="comment-author">뉴비:</span> 오... 꿀팁이네요. 바로 갑니다.</div>
+                                <div class="comment"><span class="comment-author">아가사랑해:</span> 역시 칭찬이 최고죠! 우리 아가는 칭찬해주면 너무 좋아해요.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements-section">
+                    <h2 class="section-title">도전 과제</h2>
+                    <div class="achievements-grid">
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🍼</div>
+                            <div class="achievement-details">
+                                <h4>아빠가 맘마 줄게</h4>
+                                <p class="achievement-desc">처음으로 젖병을 사용하여 우정에게 식사를 제공했습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 95.2%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🎆</div>
+                            <div class="achievement-details">
+                                <h4>너는 나의 불꽃</h4>
+                                <p class="achievement-desc">불꽃놀이를 배경으로 첫 야외 '놀이'를 성공적으로 마쳤습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 78.4%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🐟</div>
+                            <div class="achievement-details">
+                                <h4>물 만난 물고기</h4>
+                                <p class="achievement-desc">욕조에서 물고기 로봇을 사용하여 우정의 '스트레스'를 해소했습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 65.1%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🛋️</div>
+                            <div class="achievement-details">
+                                <h4>안전 제일</h4>
+                                <p class="achievement-desc">'힐링 돔'을 사용하여 외부 충격으로 불안해하는 우정을 '진정'시켰습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 58.9%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🏥</div>
+                            <div class="achievement-details">
+                                <h4>아야 했어요?</h4>
+                                <p class="achievement-desc">우정의 첫 종합 검진을 무사히 마쳤습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 42.3%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">⚔️</div>
+                            <div class="achievement-details">
+                                <h4>내 아가 건들지 마!</h4>
+                                <p class="achievement-desc">다른 소유주로부터 우정을 '보호'했습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 25.6%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🧸</div>
+                            <div class="achievement-details">
+                                <h4>최고의 친구</h4>
+                                <p class="achievement-desc">애착 곰 인형을 사용하여 우정을 '진정'시키고 '놀아'주었습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 51.7%가 획득함</p>
+                            </div>
+                        </div>
+                         <div class="achievement-card">
+                            <div class="achievement-icon">😭</div>
+                            <div class="achievement-details">
+                                <h4>기쁨의 눈물</h4>
+                                <p class="achievement-desc">우정이 '너무 좋아서' 10번 이상 울었습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 33.3%가 획득함</p>
+                            </div>
+                        </div>
+                        <div class="achievement-card">
+                            <div class="achievement-icon">🚽</div>
+                            <div class="achievement-details">
+                                <h4>아빠랑 같이 쉬-</h4>
+                                <p class="achievement-desc">우정의 배변 활동을 직접 도와주었습니다.</p>
+                                <p class="achievement-rarity">전체 플레이어의 68.2%가 획득함</p>
+                            </div>
+                        </div>
+                         <div class="achievement-card">
+                            <div class="achievement-icon">🤝</div>
+                            <div class="achievement-details">
+                                <h4>친구 만들기</h4>
+                                <p class="achievement-desc">칼먼의 저택에서 우정이 '록시'를 만났습니다.</p>
+                                <p class="achievement-rarity">희귀도: 전체 플레이어의 9.8%가 획득함</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    const mainStorePage = document.getElementById('main-store-page');
+    const communityHubPage = document.getElementById('community-hub-page');
+    const storeButton = document.getElementById('store-button');
+    const communityButton = document.getElementById('community-button');
+    const gameHeaderTitle = document.getElementById('game-header-title');
+
+    // 페이지 전환 함수
+    function showPage(page) {
+        mainStorePage.classList.remove('active');
+        communityHubPage.classList.remove('active');
+        page.classList.add('active');
+        gameHeaderTitle.textContent = (page === mainStorePage) ? '나의 작은 우주: My Little Cosmos' : '커뮤니티 허브';
+    }
+
+    storeButton.addEventListener('click', () => showPage(mainStorePage));
+    communityButton.addEventListener('click', () => showPage(communityHubPage));
+
+    // 초기 페이지 설정
+    showPage(mainStorePage);
+    
+    // 캐러셀 기능
+    const mainMedia = document.querySelector('.main-media');
+    const mainMediaDescription = document.querySelector('.main-media-description');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', () => {
+            thumbnails.forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+            
+            const description = thumb.getAttribute('data-description');
+            mainMediaDescription.textContent = description;
+            
+            const isTrailer = thumb.getAttribute('data-type') === 'trailer';
+            const timelineBar = document.querySelector('.timeline-bar');
+            timelineBar.style.display = isTrailer ? 'block' : 'none';
+        });
+    });
+
+    // 가이드 아코디언 기능
+    const guideItems = document.querySelectorAll('.guide-item');
+    guideItems.forEach(item => {
+        const header = item.querySelector('.guide-header');
+        const content = item.querySelector('.guide-content');
+        header.addEventListener('click', () => {
+            const isOpen = content.classList.contains('open');
+            // 모든 가이드 컨텐츠를 닫음
+            document.querySelectorAll('.guide-content').forEach(c => c.classList.remove('open'));
+            // 현재 클릭된 것만 토글
+            if (!isOpen) {
+                content.classList.add('open');
+            }
+        });
+    });
+
+</script>
+
+</body>
+</html>
