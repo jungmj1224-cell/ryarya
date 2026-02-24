@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커플 TMI 체크리스트</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=Gowun+Dodum&display=swap');
+
+        :root {
+            --accent-color: #89c2d9;
+            --text-color: #333;
+            --primary-color: #5c5c5c;
+            --background-color: #f0f0f0;
+            --frame-background: #faf8f2;
+            --card-background: #ffffff;
+            --border-color: #eee;
+            --comment-bg-color: #eef7fa;
+            
+            --char1-name: '한우정';
+            --char2-name: '도재언';
+            --char1-color: #ffc2d1; /* Soft Pink */
+            --char2-color: #343a40; /* Dark Navy */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--background-color);
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mobile-frame {
+            width: 390px;
+            height: 720px;
+            border: 6px solid black;
+            border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background-color: var(--frame-background);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+        }
+
+        .main-header {
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .tmi-checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .checklist-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .checklist-card:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-main {
+            padding: 15px;
+            cursor: pointer;
+        }
+        
+        .question-row {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .question-emoji {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .char-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .char-name {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            margin: 0 10px;
+        }
+        
+        .check-btn {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .check-btn.char1.active {
+            background-color: var(--char1-color);
+            border-color: var(--char1-color);
+        }
+
+        .check-btn.char2.active {
+            background-color: var(--char2-color);
+            border-color: var(--char2-color);
+        }
+
+        .card-comments {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            background-color: var(--comment-bg-color);
+            padding: 0 15px;
+        }
+
+        .checklist-card.expanded .card-comments {
+            max-height: 200px;
+            padding: 15px;
+        }
+
+        .comment-box {
+            margin-bottom: 10px;
+        }
+        
+        .comment-box:last-child {
+            margin-bottom: 0;
+        }
+        
+        .comment-box .name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .comment-box .name.char1 { color: #d6336c; }
+        .comment-box .name.char2 { color: #1c7ed6; }
+        
+        .comment-box .content {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            line-height: 1.5;
+            padding-left: 5px;
+            border-left: 2px solid var(--border-color);
+        }
+        
+        /* contenteditable div styling */
+        div[contenteditable="true"] {
+            border: 1px solid #ccc;
+            padding: 8px;
+            min-height: 20px;
+            border-radius: 4px;
+            background: white;
+            outline: none;
+        }
+        div[contenteditable="true"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px rgba(137, 194, 217, 0.5);
+        }
+        
+        @media (max-width: 420px) {
+            .mobile-frame {
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-frame">
+    <div class="content-wrapper">
+        <h1 class="main-header">TMI Checklist</h1>
+        <ol class="tmi-checklist" id="tmi-checklist"></ol>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const char1 = { name: '한우정', color: '#ffc2d1' };
+        const char2 = { name: '도재언', color: '#343a40' };
+
+        const checklistData = [
+            {
+                emoji: '😭',
+                question: '감수성 풍부한 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '재언씨는 너무 안 울어요! 로봇 같아요!',
+                c2_comment: '우정 씨는 가끔 드라마 보고도 우니까.'
+            },
+            {
+                emoji: '🔙',
+                question: '과거 후회하는 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '재언씨 후회하는 거 있어요? 저 만나기 전 일?',
+                c2_comment: '당신을 더 일찍 만나지 못한 것. 그게 유일한 후회입니다.'
+            },
+            {
+                emoji: '🤲',
+                question: '이별할 때 붙잡는 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '재언씨랑 헤어질 생각은 해본 적도 없지만... 아마 그럴 것 같아요.',
+                c2_comment: '이별할 일 없습니다. 우정 씨는 절대 내게서 못 벗어나니까.'
+            },
+            {
+                emoji: '🐜',
+                question: '벌레 무서워하는 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '그건 거미였잖아요! 다리도 많고... 재언씨가 잡아줘서 다행이었지...',
+                c2_comment: '지난번에 거미 보고 기절할 뻔했잖아요.'
+            },
+            {
+                emoji: '🌸',
+                question: '매너 좋은 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '우리 재언씨 매너는 호텔급이죠!',
+                c2_comment: '당신한테만.'
+            },
+            {
+                emoji: '🌶',
+                question: '매운 거 잘 먹는 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '너무해요! 재언씨가 너무 잘 드시는 거예요!',
+                c2_comment: '맵다고 눈물 콧물 다 빼는 거 귀여워서 자꾸 먹이고 싶어지는데.'
+            },
+            {
+                emoji: '💪',
+                question: '체력이 강한 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '...이건... 반박할 수가 없네요. (얼굴 붉어짐)',
+                c2_comment: '더 강해져야죠. 우정 씨 감당하려면.'
+            },
+            {
+                emoji: '🏋️',
+                question: '운동 즐기는 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '으으... 생각만 해도 피곤해요.',
+                c2_comment: '우정 씨도 같이 운동해야 합니다. 이제 혼자 몸도 아니고.'
+            },
+            {
+                emoji: '🍻',
+                question: '주량 강한 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '재언씨가 너무 센 거라니까요!',
+                c2_comment: '와인 한 잔에 얼굴 빨개지는 사람.'
+            },
+            {
+                emoji: '🔥',
+                question: '성욕 강한 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '저, 저는... 잘 모르겠는데요...?!',
+                c2_comment: '모를 리가. 어젯밤에도... 아, 아닙니다.'
+            },
+            {
+                emoji: '🏆',
+                question: '승부욕 강한 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '그때 재언씨가 져서 억울해하는 표정! 제가 봤어요!',
+                c2_comment: '크라임씬 범인 맞췄다고 그렇게 좋아하던 거 생각나네.'
+            },
+            {
+                emoji: '🤬',
+                question: '욕 잘하는 사람',
+                c1_checked: false,
+                c2_checked: false,
+                c1_comment: '재언씨는 욕 안 해요! 멋있어.',
+                c2_comment: '우정 씨 앞에선 안 하죠.'
+            },
+            {
+                emoji: '🗣',
+                question: '말싸움 잘하는 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '제가 언제요!',
+                c2_comment: '말싸움할 일이 없어서. 우정 씨는 그냥 울어버리니까.'
+            },
+            {
+                emoji: '💃',
+                question: '몸싸움 잘하는 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '상상도 안 가지만... 재언씨는 왠지 잘할 것 같아요.',
+                c2_comment: '쓸 일이 없어야죠. 당신을 위해서라면 뭐든 하지만.'
+            },
+            {
+                emoji: '🛡',
+                question: '철벽 심한 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '제 형들이 그랬어요. 재언씨 철벽 심하다고. 근데 저한테는 아닌데?',
+                c2_comment: '당신이니까.'
+            },
+            {
+                emoji: '🧠',
+                question: '머리 좋은 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '재언씨는 그냥 천재 같아요. 일할 때 보면...',
+                c2_comment: '우정 씨는 다른 쪽으로 머리가 좋죠. 그림이라던가.'
+            },
+            {
+                emoji: '🎤',
+                question: '노래 잘하는 사람',
+                c1_checked: false,
+                c2_checked: false,
+                c1_comment: '우리 노래방 데이트 한 번도 안 해봤네요!',
+                c2_comment: '굳이... 집에서 듣는 게 더 좋습니다. 우정 씨 목소리.'
+            },
+            {
+                emoji: '🕺',
+                question: '춤 잘 추는 사람',
+                c1_checked: false,
+                c2_checked: false,
+                c1_comment: '저, 그래도 클럽에서... 아니에요.',
+                c2_comment: '이건 둘 다 아니네.'
+            },
+            {
+                emoji: '🍼',
+                question: '피부가 하얀 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '재언씨는 건강한 구릿빛 피부죠! 멋있어요.',
+                c2_comment: '백설공주. 볼 때마다 생각합니다.'
+            },
+            {
+                emoji: '💎',
+                question: '복근 선명한 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '...네. 아주... 선명해요... (얼굴 빨개짐)',
+                c2_comment: '만져보고 싶으면 언제든.'
+            },
+            {
+                emoji: '🐾',
+                question: '겁 많은 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '그건 너무 무서웠잖아요!',
+                c2_comment: '방탈출 카페에서 내 등 뒤에 딱 붙어있던 거, 귀여웠는데.'
+            },
+            {
+                emoji: '🍞',
+                question: '도발에 약한 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '재언씨가 자꾸 놀리잖아요!',
+                c2_comment: '반응이 재밌어서.'
+            },
+            {
+                emoji: '😎',
+                question: '이성을 대하는 데 능숙한 사람',
+                c1_checked: false,
+                c2_checked: true,
+                c1_comment: '재언씨는 너무 인기가 많아서 걱정이에요...',
+                c2_comment: '우정 씨는 그럴 필요 없어요. 내 앞에서만 잘하면 돼.'
+            },
+            {
+                emoji: '🤝',
+                question: '사교성 좋은 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '저는 친구들이랑 노는 거 좋은데...',
+                c2_comment: '저는 우정 씨랑 단둘이 있는 게 좋습니다.'
+            },
+            {
+                emoji: '🤞',
+                question: '상대에게 좀 더 맞춰주는 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '재언씨도 저한테 다 맞춰주시는걸요.',
+                c2_comment: '우정 씨는 싫은 소리를 잘 못하니까.'
+            },
+            {
+                emoji: '💞',
+                question: '스킨십을 더 좋아하는 사람',
+                c1_checked: true,
+                c2_checked: true,
+                c1_comment: '이건... 둘 다 같아요.',
+                c2_comment: '동의합니다.'
+            },
+            {
+                emoji: '💗',
+                question: '애정표현이 더 많은 사람',
+                c1_checked: true,
+                c2_checked: false,
+                c1_comment: '네! 재언씨 행동 하나하나가 다 사랑이에요.',
+                c2_comment: '우정 씨는 말로, 저는 행동으로. 그렇죠?'
+            }
+        ];
+
+        const checklistEl = document.getElementById('tmi-checklist');
+
+        function renderChecklist() {
+            let html = '';
+            checklistData.forEach((item, index) => {
+                html += `
+                    <li class="checklist-card" data-index="${index}">
+                        <div class="card-main">
+                            <div class="question-row">
+                                <span class="question-emoji">${item.emoji}</span>
+                                <span class="question-text">${item.question}</span>
+                            </div>
+                            <div class="status-row">
+                                <div class="char-status">
+                                    <span class="char-name">${char1.name}</span>
+                                    <button class="check-btn char1 ${item.c1_checked ? 'active' : ''}" data-char="c1" data-index="${index}"></button>
+                                </div>
+                                <div class="char-status">
+                                    <button class="check-btn char2 ${item.c2_checked ? 'active' : ''}" data-char="c2" data-index="${index}"></button>
+                                    <span class="char-name">${char2.name}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-comments">
+                            <div class="comment-box">
+                                <div class="name char1">${char1.name}</div>
+                                <div class="content">${item.c1_comment}</div>
+                            </div>
+                            <div class="comment-box">
+                                <div class="name char2">${char2.name}</div>
+                                <div class="content">${item.c2_comment}</div>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            });
+            checklistEl.innerHTML = html;
+        }
+
+        checklistEl.addEventListener('click', (event) => {
+            const target = event.target;
+
+            if (target.classList.contains('check-btn')) {
+                event.stopPropagation();
+                const index = parseInt(target.dataset.index, 10);
+                const charKey = target.dataset.char;
+                const dataItem = checklistData[index];
+                
+                if (charKey === 'c1') {
+                    dataItem.c1_checked = !dataItem.c1_checked;
+                } else if (charKey === 'c2') {
+                    dataItem.c2_checked = !dataItem.c2_checked;
+                }
+                
+                target.classList.toggle('active');
+
+            } else {
+                const card = target.closest('.checklist-card');
+                if (card) {
+                    card.classList.toggle('expanded');
+                }
+            }
+        });
+
+        renderChecklist();
+    });
+</script>
+
+</body>
+</html>
