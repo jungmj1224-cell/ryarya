@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube</title>
+    <style>
+        :root {
+            --yt-background: #0f0f0f;
+            --yt-surface: #1f1f1f;
+            --yt-surface-hover: #3f3f3f;
+            --yt-primary-text: #f1f1f1;
+            --yt-secondary-text: #aaa;
+            --yt-border-color: #303030;
+            --yt-button-color: #3ea6ff;
+            --yt-subscribe-button: #c00;
+            --yt-subscribed-button: #5c5c5c;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+            background-color: var(--yt-background);
+            color: var(--yt-primary-text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .youtube-container {
+            width: 100%;
+            max-width: 1280px;
+            display: flex;
+            background-color: var(--yt-background);
+        }
+
+        .sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            padding: 20px 10px;
+            border-right: 1px solid var(--yt-border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--yt-primary-text);
+            margin-bottom: 30px;
+        }
+        .sidebar-logo span { color: var(--yt-subscribe-button); }
+
+        .sidebar-menu {
+            width: 100%;
+        }
+        .sidebar-item {
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .sidebar-item:hover {
+            background-color: var(--yt-surface);
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--yt-border-color);
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 600px;
+            display: flex;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: #121212;
+            border: 1px solid var(--yt-border-color);
+            border-radius: 40px 0 0 40px;
+            color: var(--yt-primary-text);
+            font-size: 16px;
+        }
+        .search-bar button {
+            padding: 0 25px;
+            background-color: var(--yt-surface);
+            border: 1px solid var(--yt-border-color);
+            border-left: none;
+            border-radius: 0 40px 40px 0;
+            cursor: pointer;
+        }
+        
+        .user-profile {
+            width: 32px;
+            height: 32px;
+            background-color: var(--yt-button-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 메인 채널 페이지 */
+        .channel-header {
+            width: 100%;
+        }
+
+        .channel-banner {
+            width: 100%;
+            height: 180px;
+            background-color: var(--yt-surface);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: var(--yt-secondary-text);
+            margin-bottom: 20px;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+        
+        .channel-profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--yt-surface);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .channel-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channel-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .channel-stats {
+            font-size: 14px;
+            color: var(--yt-secondary-text);
+        }
+
+        .video-list-container {
+            height: calc(100vh - 430px);
+            overflow-y: scroll;
+        }
+
+        .video-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .video-card {
+            cursor: pointer;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 160px;
+            background-color: var(--yt-surface);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+            padding: 10px;
+            color: var(--yt-secondary-text);
+            box-sizing: border-box;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            font-size: 12px;
+            color: var(--yt-secondary-text);
+        }
+
+        /* 영상 상세 페이지 */
+        #video-detail-page {
+            display: flex;
+            gap: 20px;
+        }
+        .video-main {
+            flex: 2;
+        }
+        .related-videos {
+            flex: 1;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 480px;
+            background-color: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .video-scene-description {
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .video-progress-bar-container {
+            position: absolute;
+            bottom: 10px;
+            width: 95%;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .video-progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--yt-subscribe-button);
+            border-radius: 2px;
+            transition: width 1s linear;
+        }
+
+        .video-info-bar {
+            padding: 15px 0;
+        }
+        .video-detail-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .video-channel-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .video-channel-info .channel-profile-pic {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+        .video-channel-info .channel-name {
+            font-size: 16px;
+        }
+        #subscribe-btn {
+            background-color: var(--yt-primary-text);
+            color: var(--yt-background);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #subscribe-btn.subscribed {
+             background-color: var(--yt-subscribed-button);
+             color: var(--yt-primary-text);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .action-buttons button {
+            background-color: var(--yt-surface);
+            color: var(--yt-primary-text);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .action-buttons button:hover {
+            background-color: var(--yt-surface-hover);
+        }
+
+        .video-description {
+            background-color: var(--yt-surface);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: 15px;
+        }
+        .video-description .hashtags {
+            color: var(--yt-button-color);
+            margin-top: 10px;
+        }
+
+        .comment-section {
+            margin-top: 20px;
+        }
+        
+        .comment-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .comment-input-area .user-profile {
+            flex-shrink: 0;
+        }
+        .comment-input-area input {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--yt-border-color);
+            color: var(--yt-primary-text);
+            font-size: 14px;
+        }
+        .comment-input-area input:focus {
+            outline: none;
+            border-bottom: 1px solid var(--yt-primary-text);
+        }
+        .comment-input-area button {
+            background-color: var(--yt-button-color);
+            border: none;
+            color: var(--yt-background);
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        
+        .comment {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .comment .user-profile {
+            width: 40px;
+            height: 40px;
+        }
+        .comment-content .username {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .comment-content .timestamp {
+            color: var(--yt-secondary-text);
+            font-size: 12px;
+        }
+        .comment-text {
+            margin-top: 4px;
+        }
+        .comment-reply {
+            margin-left: 55px;
+        }
+        .owner-reply .comment-content {
+            background-color: var(--yt-surface);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .related-videos .video-card {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .related-videos .thumbnail {
+            width: 160px;
+            height: 90px;
+            flex-shrink: 0;
+            margin: 0;
+        }
+        .related-videos .video-info {
+            flex-grow: 1;
+        }
+        .related-videos .video-title {
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="youtube-container">
+        <div class="sidebar">
+            <div class="sidebar-logo">You<span>Tube</span></div>
+            <div class="sidebar-menu">
+                <div class="sidebar-item">🏠 홈</div>
+                <div class="sidebar-item">🔍 탐색</div>
+                <div class="sidebar-item">📺 구독</div>
+                <div class="sidebar-item"> Originals</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="search-bar">
+                    <input type="text" placeholder="검색">
+                    <button>🔍</button>
+                </div>
+                <div class="user-profile" id="user-profile-icon">우</div>
+            </div>
+
+            <div class="content-area">
+                <!-- 메인 채널 페이지 -->
+                <div id="channel-main-page">
+                    <div class="channel-header">
+                        <div class="channel-banner">[배너 설명: 파스텔 톤 수채화 배경에 '우리의 모든 날들이 재언과 우정으로 가득하길'이라는 손글씨 문구가 쓰여 있다.]</div>
+                        <div class="channel-info">
+                            <div class="channel-profile-pic">🤍🖤</div>
+                            <div class="channel-meta">
+                                <div class="channel-name">우재로운 생활</div>
+                                <div class="channel-stats">@woojae_life ‧ 구독자 23.7만명 ‧ 동영상 15개</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-list-container">
+                        <div class="video-list" id="video-list-main">
+                            <!-- JS로 동영상 목록 생성 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 영상 상세 페이지 -->
+                <div id="video-detail-page" class="hidden">
+                    <div class="video-main">
+                        <div class="video-player">
+                            <div class="video-scene-description">[영상 설명: 로딩 중...]</div>
+                            <div class="video-progress-bar-container">
+                                <div class="video-progress-bar" id="video-progress-bar"></div>
+                            </div>
+                        </div>
+                        <div class="video-info-bar">
+                            <div class="video-detail-title" id="video-detail-title"></div>
+                            <div class="actions-bar">
+                                <div class="video-channel-info">
+                                    <div class="channel-profile-pic" onclick="goToChannel()">🤍🖤</div>
+                                    <div>
+                                        <div class="channel-name">우재로운 생활</div>
+                                        <div class="channel-stats">구독자 23.7만명</div>
+                                    </div>
+                                    <button id="subscribe-btn" onclick="toggleSubscribe()">구독</button>
+                                </div>
+                                <div class="action-buttons">
+                                    <button id="like-btn" onclick="likeVideo()">👍 <span id="like-count"></span></button>
+                                    <button>↪️ 공유</button>
+                                    <button>⬇️ 오프라인 저장</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-description">
+                            <p id="video-detail-description"></p>
+                            <div class="hashtags" id="video-detail-hashtags"></div>
+                        </div>
+                        <div class="comment-section">
+                            <h3 id="comment-count-header">댓글 0개</h3>
+                            <div class="comment-input-area">
+                                <div class="user-profile">우</div>
+                                <input type="text" id="comment-input" placeholder="댓글 추가...">
+                                <button onclick="addComment()">댓글</button>
+                            </div>
+                            <div id="comment-list">
+                                <!-- JS로 댓글 목록 생성 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="related-videos">
+                        <h3>관련 동영상</h3>
+                        <div id="related-videos-list">
+                           <!-- JS로 관련 동영상 목록 생성 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const videoData = {
+        1: {
+            id: 1,
+            thumbnail: "[썸네일 설명: 도재언과 한우정이 초음파 사진을 함께 들고 환하게 웃고 있다. 상단에 '저희... 부모가 됩니다!'라는 문구가 쓰여 있다.]",
+            title: "[속보] 저희에게 아기천사가 찾아왔어요ㅣ임신 6주차, 눈물의 첫만남",
+            views: "88만",
+            uploadDate: "3주 전",
+            likes: 120541,
+            description: "안녕하세요, 우재로운 생활의 우정, 재언입니다.\n오늘은 여러분께 조금 특별하고 기쁜 소식을 전해드리려고 해요. 저희에게 소중한 아기 천사 '미소'가 찾아왔습니다.\n아직 모든 것이 얼떨떨하고 실감이 나지 않지만, 세상에서 가장 큰 선물을 받은 것 같아 하루하루 감사한 마음으로 지내고 있습니다.\n앞으로 저희와 함께 미소의 성장기도 지켜봐 주세요! 항상 응원해주셔서 감사합니다.",
+            hashtags: "#임밍아웃 #예비부모 #커플브이로그",
+            scenes: [
+                { time: 0, desc: "[영상 설명: 우정이 긴장한 표정으로 재언을 바라본다. 재언은 아무것도 모른 채 '무슨 할 말 있어요?'라며 다정하게 묻는다.]" },
+                { time: 20, desc: "[영상 설명: 우정이 작은 초음파 사진을 건넨다. 사진을 본 재언의 표정이 그대로 굳는다. 동공이 흔들리며 몇 번이고 사진과 우정을 번갈아 본다.]" },
+                { time: 40, desc: "[자막/재언: ...이게, 우리 아이입니까?]"},
+                { time: 60, desc: "[영상 설명: 재언이 우정을 와락 끌어안는다. 품에 안긴 우정의 등을 토닥이는 손길이 미세하게 떨리고 있다. 감격과 놀라움이 뒤섞인 표정이다.]" },
+                { time: 80, desc: "[자막/우정: 재언 씨가 좋은 아빠가 되어줄 것 같아서 든든해요. 고마워요.]" },
+                { time: 100, desc: "[영상 설명: 재언이 우정의 배에 조심스럽게 입을 맞춘다. '미소야, 아빠야.'라고 속삭이는 목소리가 살짝 잠겨 있다.]" }
+            ],
+            comments: [
+                { user: "꿀떨어지는재언눈빛", profile: "🍯", text: "미쳤다ㅠㅠㅠㅠ 도상무님 표정 굳는 거 보고 나까지 숨 참았네ㅠㅠㅠㅠㅠㅠㅠ 진짜 감동적이에요 축하드려요!!!", time: "3주 전" },
+                { user: "한태원", profile: "😠", text: "하여간 우리 막내 울리는 건 선수야. 도서방, 이제부터 시작이야. 각오 단단히 해.", time: "3-주 전", isOwner: false, isNPC: true,
+                  reply: { user: "Do_JaeEon", profile: "🖤", text: "걱정 마십시오. 세상에서 가장 행복하게 해줄 겁니다.", time: "3주 전", isOwner: true } 
+                },
+                { user: "Miso_Angel", profile: "👼", text: "우정님 재언님 너무 축하드려요! 미소라는 태명도 너무 예뻐요💖 건강하게 태어나길 기도할게요!", time: "2주 전" }
+            ],
+            related: [
+                { thumb: "[썸네일: 아기 신발과 초음파 사진]", title: "임신 준비부터 출산까지, 예비맘 필독!", channel: "육아의 신" },
+                { thumb: "[썸네일: 남자가 눈물을 흘리는 모습]", title: "아내의 임신 소식을 들은 남편들의 실제 반응", channel: "감동실화" }
+            ]
+        },
+        2: {
+            id: 2,
+            thumbnail: "[썸네일 설명: 넓은 거실 통창을 배경으로 재언이 우정의 허리를 감싸 안고 있다. '남편이 준비한 DREAM HOUSE'라는 문구가 쓰여 있다.]",
+            title: "랜선집들이! 남편이 모든 걸 꾸며준 신혼집 최초공개 🏡 (ft. 미소 방은 아직 비밀)",
+            views: "65만",
+            uploadDate: "2주 전",
+            likes: 98320,
+            description: "안녕하세요 여러분! 드디어 저희의 새로운 보금자리를 공개합니다.\n결혼과 함께 이사하게 된 한남동 주택이에요. 아직은 텅 빈 공간이 많지만, 앞으로 저희와 미소의 추억으로 가득 채워나갈 생각에 벌써부터 설레네요.\n특히 우정이의 그림으로 가득 채워질 작업실과, 햇살이 가득 들어오는 거실이 정말 마음에 들어요. (물론 재언 픽!)\n아! 그리고 가장 중요한 미소의 방은... 나중에 따로 공개할게요! 😉",
+            hashtags: "#신혼집 #랜선집들이 #인테리어",
+            scenes: [
+                { time: 0, desc: "[영상 설명: '띵동' 소리와 함께 현관문이 열리고, 재언이 우정을 안아들고 들어온다. '우리 집에 온 걸 환영합니다.'라고 말하는 재언과 부끄러워하는 우정.]" },
+                { time: 25, desc: "[자막: 이 집의 모든 인테리어는 도대표님...아니 재언씨가 직접 골랐습니다 (자랑)]"},
+                { time: 50, desc: "[영상 설명: 우정이 2층 작업실의 통창을 보며 감탄한다. 재언은 뒤에서 그런 우정을 흐뭇하게 바라본다.]" },
+                { time: 75, desc: "[자막/재언: 여기서 당신이 행복하게 그림 그리는 모습, 매일 보고 싶으니까.]" },
+                { time: 100, desc: "[영상 설명: 두 사람이 텅 빈 아기방에 서서, 아기 침대가 놓일 자리를 함께 가늠해본다. 서로를 보며 따뜻하게 미소 짓는다.]" }
+            ],
+             comments: [
+                { user: "우리집이었으면", profile: "🏠", text: "와 집 진짜... 드라마에서 보던 집인데요...? 정원까지 완벽... 도상무님 클래스 어디 안 가네요.", time: "2주 전" },
+                { user: "한우정바라기", profile: "🌻", text: "우정님 작업실 보고 제가 다 감동했어요ㅠㅠ 재언님 진짜 스윗가이... 미소 방도 너무 기대돼요!", time: "2주 전" },
+                { user: "Bot_Advertisement", profile: "🤖", text: "임산부에게 꼭 필요한 국민템! OOO 영양제 특가 할인! 링크 클릭!", time: "1주 전" }
+            ],
+            related: [
+                { thumb: "[썸네일: 깔끔한 화이트톤 인테리어]", title: "요즘 유행하는 신혼집 인테리어 BEST 5", channel: "오늘의 집" },
+                { thumb: "[썸네일: 정원이 있는 전원주택]", title: "서울 근교 10억대 정원 있는 집", channel: "부동산 읽어주는 남자" }
+            ]
+        },
+        3: {
+            id: 3,
+            thumbnail: "[썸네일 설명: 재언이 손바닥 위에 올려진 작은 아기 신발을 사랑스럽게 내려다보고 있다. 우정은 그런 재언의 팔에 기댄 채 웃고 있다.]",
+            title: "세상에서 제일 작은 신발 👟 | 예비아빠 눈에서 꿀 떨어지는 아기용품 쇼핑 브이로그",
+            views: "72만",
+            uploadDate: "1주 전",
+            likes: 115043,
+            description: "미소의 첫 정기검진을 다녀온 날! 심장 소리를 듣고 오니 아기 용품들이 눈에 아른거려서 결국 백화점에 다녀왔습니다 ㅎㅎ\n아직 성별도 모르는데 벌써 이것저것 사버린 저희, 정상인가요? 😂\n특히 재언 씨가 저보다 더 신나서 이것저것 고르는 모습이 너무 귀엽고 웃겼어요. (이 영상 보면 혼날지도..)\n저희가 미소를 위해 처음으로 산 선물들, 영상으로 함께 구경해요!",
+            hashtags: "#아기용품 #출산준비 #예비아빠",
+            scenes: [
+                { time: 0, desc: "[영상 설명: 백화점 유아용품 코너. 재언이 손바닥만 한 아기 덧신을 들고 신기한 듯 바라본다. '이거 봐요. 정말 작네요.']" },
+                { time: 25, desc: "[자막/우정: 저보다 더 신난 예비아빠... 귀여워...🤭]" },
+                { time: 50, desc: "[영상 설명: 우정이 노란색 배냇저고리를 들고 '이거 너무 귀엽지 않아요?'라고 묻는다. 재언은 옷이 아니라 우정을 보며 고개를 끄덕인다. '당신이 드니까 더 귀엽네요.']" },
+                { time: 75, desc: "[영상 설명: 계산대 옆에 있는 커다란 곰인형을 보고 망설이는 우정. 재언이 그걸 보더니 '저 곰인형도 같이 포장해주세요.'라고 말한다.]" },
+                { time: 100, desc: "[영상 설명: 집으로 돌아와, 쇼핑한 아기용품들을 하나씩 펼쳐보는 두 사람. 재언이 아기 신발을 자신의 손가락에 끼워보며 미소 짓는다.]" }
+            ],
+            comments: [
+                { user: "예비아빠재언", profile: "👨‍🍼", text: "도상무님... 저렇게 스윗한 분이셨나요... 아기 신발 보면서 웃는 거 보고 제 심장이 다 녹았어요...", time: "1주 전" },
+                { user: "HJ_Cotton", profile: "🤍", text: "이날 사온 곰인형은 저희 침대 옆에 잘 있어요! ㅎㅎ 다들 영상 재밌게 봐주셔서 감사해요~!", time: "6일 전", isOwner: true },
+                { user: "한정원", profile: "👓", text: "너무 이른 거 아닌가. 그래도 우정이가 좋아하니 다행이네. 무리하지는 말고.", time: "1주 전", isNPC: true }
+            ],
+            related: [
+                { thumb: "[썸네일: 아기용품 리스트]", title: "선배맘이 추천하는 실패없는 출산 준비물 리스트 (내돈내산)", channel: "슬기로운 육아생활" },
+                { thumb: "[썸네ile: 여러 브랜드의 아기 옷]", title: "신생아 옷 브랜드별 장단점 비교!", channel: "깐깐한 엄마" }
+            ]
+        },
+        4: {
+            id: 4,
+            thumbnail: "[썸네일 설명: 재언이 앞치마를 두르고 요리에 집중하고 있다. 그 옆에서 우정이 불안한 눈으로 재료를 썰고 있다. '제발... 먹을 수 있기를!' 이라는 자막.]",
+            title: "입덧하는 아내를 위한 도상무의 특급 레시피! (과연 우정의 평가는?)",
+            views: "54만",
+            uploadDate: "5일 전",
+            likes: 89970,
+            description: "요즘 입덧 때문에 고생하는 저를 위해 재언 셰프가 나섰습니다! 👨‍🍳\n새콤달콤하면서도 위에 부담 없는 '소고기 토마토 스튜'를 만들어줬어요.\n저도 옆에서 보조를 하긴 했는데... 도움이 된 건지는 잘 모르겠네요 ^^;\n과연 재언 셰프의 요리는 입덧마저 이겨냈을까요?",
+            hashtags: "#남편의요리 #입덧레시피 #집밥",
+             scenes: [
+                { time: 0, desc: "[영상 설명: 재언이 능숙하게 채소를 손질한다. 옆에서 우정이 양파를 썰다가 눈이 맵다며 훌쩍인다.]" },
+                { time: 25, desc: "[자막/재언: 그냥 제가 다 할 테니까 저기 가서 앉아 있어요. 눈 맵게 왜 울고 그래.]" },
+                { time: 50, desc: "[영상 설명: 재언이 완성된 스튜를 그릇에 담아 우정에게 건넨다. 우정이 조심스럽게 한 숟갈 떠먹는다.]" },
+                { time: 75, desc: "[영상 설명: 눈을 동그랗게 뜨고 '맛있어요!'라고 외치는 우정. 재언은 그제야 안심한 듯 미소 짓는다.]" },
+                { time: 100, desc: "[영상 설명: 우정의 입가에 묻은 소스를 냅킨으로 닦아주는 재언. '많이 먹어요. 내일 또 해줄 테니.']" }
+            ],
+            comments: [
+                { user: "요리왕도재언", profile: "🍳", text: "아니 저분은 못하는 게 뭐죠...? 회사일에 요리에... 우정님은 진짜 전생에 나라를 구하셨나봐요.", time: "4일 전" },
+                { user: "프로참견러", profile: "🤔", text: "임신 초기엔 토마토가 산도 때문에 안 좋을 수도 있다던데... 괜찮으려나", time: "3일 전", 
+                  reply: { user: "Do_JaeEon", profile: "🖤", text: "의사와 영양사에게 모두 자문 구한 레시피입니다. 걱정 감사합니다.", time: "3일 전", isOwner: true } 
+                },
+             ],
+            related: [
+                { thumb: "[썸네일: 상큼한 과일 샐러드]", title: "입덧 가라앉히는 상큼 레시피 3가지", channel: "맛남의식탁" },
+                { thumb: "[썸네일: 남편이 요리하는 모습]", title: "아내를 위해 요리하는 남자들의 유형", channel: "부부 관찰" }
+            ]
+        },
+        5: {
+            id: 5,
+            thumbnail: "[썸네일 설명: 두 사람이 소파에 앉아 질문이 적힌 종이를 보며 웃고 있다. 'Q. 두 분... 아직도 존댓말 쓰세요?' 라는 질문이 말풍선으로 떠 있다.]",
+            title: "20만 구독자 기념 Q&A | 첫만남부터 👶이야기까지, 작정하고 다 물어봤습니다!",
+            views: "95만",
+            uploadDate: "1일 전",
+            likes: 130112,
+            description: "안녕하세요! 어느덧 저희 채널 구독자가 20만 명을 넘었네요. (감격😭)\n늘 따뜻한 시선으로 지켜봐 주시는 여러분께 감사한 마음을 담아, 그동안 궁금해하셨던 질문들에 답하는 시간을 가졌습니다.\n조금 쑥스러운 질문들도 있었지만, 재언 씨와 함께 솔직하게 이야기해봤어요. 재밌게 봐주세요!",
+            hashtags: "#QnA #커플질문 #부부",
+            scenes: [
+                { time: 0, desc: "[자막: Q. 첫인상은 어땠나요?] [재언: 예뻤습니다. 지금도 예쁘고.] [우정: 잘생겼어요... (수줍)]" },
+                { time: 25, desc: "[자막: Q. 육아는 어떻게 분담하실 건가요?] [재언: 제가 다 할 겁니다. 우정 씨는 미소랑 놀아주기만 하면 돼요.]" },
+                { time: 50, desc: "[자막: Q. 태교는 어떻게 하고 계신가요?] [우정: 제가 그림 그릴 때 재언 씨가 옆에서 클래식 LP를 틀어줘요!]"},
+                { time: 75, desc: "[자막: Q. 서로에게 서운했던 적은?] [재언: 없습니다.] [우정: 음... 제가 요리 못한다고 놀릴 때요! (삐죽)]" },
+                { time: 100, desc: "[영상 설명: 영상을 마치며, 재언이 우정의 이마에 입을 맞춘다. '앞으로도 저희 세 사람, 예쁘게 지켜봐 주세요. 감사합니다.']" }
+            ],
+             comments: [
+                { user: "질문봇", profile: "🤖", text: "육아 제가 다 할겁니다<< 여기서 기절... 이게 알파다... 이게 남편이다...", time: "20시간 전" },
+                { user: "솔직히말해봐요", profile: "🤨", text: "아니 근데 진짜 궁금해서 그런데 두 분 싸우긴 하세요? 재언님은 절대 안 싸울 것 같긴 한데..", time: "15시간 전",
+                    reply: { user: "HJ_Cotton", profile: "🤍", text: "음... 제가 일방적으로 삐치고 재언씨가 풀어주는 패턴이 대부분인 것 같아요 ㅎㅎ;", time: "13시간 전", isOwner: true } 
+                },
+                 { user: "한태원", profile: "😠", text: "요리 못하는 거 맞잖아. 팩트 폭력에 서운해하면 어떡하냐. 도서방, 우리 막내 버릇 나빠지겠어.", time: "10시간 전", isNPC: true }
+             ],
+            related: [
+                { thumb: "[썸네일: 커플이 서로를 마주보는 모습]", title: "요즘 가장 핫한 커플 유튜버 3쌍", channel: "이슈 코리아" },
+                { thumb: "[썸네일: 아기 배냇저고리]", title: "선배맘들이 말하는 가장 효과적인 태교 BEST 5", channel: "맘스홀릭" }
+            ]
+        },
+    };
+
+    const mainPage = document.getElementById('channel-main-page');
+    const detailPage = document.getElementById('video-detail-page');
+    const videoListMain = document.getElementById('video-list-main');
+
+    let likeCount = 0;
+    let isSubscribed = false;
+    let currentVideoId = null;
+    let progressInterval = null;
+
+    function goToVideo(id) {
+        mainPage.classList.add('hidden');
+        detailPage.classList.remove('hidden');
+        history.pushState(null, '', `?v=${id}`);
+        loadVideoContent(id);
+    }
+
+    function goToChannel() {
+        detailPage.classList.add('hidden');
+        mainPage.classList.remove('hidden');
+        history.pushState(null, '', window.location.pathname);
+        if(progressInterval) clearInterval(progressInterval);
+    }
+
+    function loadVideoList() {
+        videoListMain.innerHTML = '';
+        Object.values(videoData).forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.onclick = () => goToVideo(video.id);
+            card.innerHTML = `
+                <div class="thumbnail">${video.thumbnail}</div>
+                <div class="video-info">
+                    <div class="video-title">${video.title}</div>
+                    <div class="video-meta">조회수 ${video.views}회 ‧ ${video.uploadDate}</div>
+                </div>
+            `;
+            videoListMain.appendChild(card);
+        });
+    }
+
+    function loadVideoContent(id) {
+        currentVideoId = id;
+        const video = videoData[id];
+        if (!video) {
+            goToChannel();
+            return;
+        }
+
+        likeCount = video.likes;
+        document.getElementById('video-detail-title').textContent = video.title;
+        document.getElementById('like-count').textContent = likeCount.toLocaleString();
+        document.getElementById('video-detail-description').textContent = video.description;
+        document.getElementById('video-detail-hashtags').textContent = video.hashtags;
+
+        const commentList = document.getElementById('comment-list');
+        commentList.innerHTML = '';
+        let totalComments = video.comments.length;
+        video.comments.forEach(commentData => {
+            const comment = createCommentElement(commentData);
+            commentList.appendChild(comment);
+            if (commentData.reply) totalComments++;
+        });
+        document.getElementById('comment-count-header').textContent = `댓글 ${totalComments}개`;
+
+        const relatedList = document.getElementById('related-videos-list');
+        relatedList.innerHTML = '';
+        video.related.forEach(relatedVideo => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `
+                <div class="thumbnail">${relatedVideo.thumb}</div>
+                <div class="video-info">
+                    <div class="video-title">${relatedVideo.title}</div>
+                    <div class="video-meta">${relatedVideo.channel}</div>
+                </div>
+            `;
+            relatedList.appendChild(card);
+        });
+        
+        // 비디오 재생 시뮬레이션
+        const progressBar = document.getElementById('video-progress-bar');
+        const sceneDesc = document.querySelector('.video-scene-description');
+        let sceneIndex = 0;
+
+        if(progressInterval) clearInterval(progressInterval);
+        
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+        sceneDesc.textContent = video.scenes[0].desc;
+
+        setTimeout(() => {
+            progressBar.style.transition = 'width 1s linear';
+            progressInterval = setInterval(() => {
+                const currentProgress = parseFloat(progressBar.style.width) || 0;
+                const newProgress = currentProgress + (100 / video.scenes.length);
+                progressBar.style.width = `${Math.min(newProgress, 100)}%`;
+
+                sceneIndex++;
+                if (sceneIndex < video.scenes.length) {
+                    sceneDesc.textContent = video.scenes[sceneIndex].desc;
+                }
+                
+                if (newProgress >= 100) {
+                    clearInterval(progressInterval);
+                }
+            }, 5000); // 5초마다 장면 전환
+        }, 100);
+
+        // 좋아요/구독 상태 초기화
+        document.getElementById('like-btn').style.backgroundColor = '';
+    }
+
+    function createCommentElement(commentData) {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'comment';
+        
+        let profileInitial = commentData.profile;
+        if (commentData.isOwner) {
+            if(commentData.user === "HJ_Cotton") profileInitial = '🤍';
+            else if(commentData.user === "Do_JaeEon") profileInitial = '🖤';
+        } else if (commentData.user === "한우정") {
+            profileInitial = '우';
+        }
+
+        commentDiv.innerHTML = `
+            <div class="user-profile">${profileInitial}</div>
+            <div class="comment-content">
+                <div>
+                    <span class="username">${commentData.user}</span>
+                    <span class="timestamp">${commentData.time}</span>
+                </div>
+                <div class="comment-text">${commentData.text}</div>
+            </div>
+        `;
+
+        if (commentData.reply) {
+            const replyDiv = document.createElement('div');
+            replyDiv.className = 'comment comment-reply owner-reply';
+            let replyProfile = commentData.reply.isOwner ? (commentData.reply.user === "HJ_Cotton" ? '🤍' : '🖤') : commentData.reply.profile;
+            replyDiv.innerHTML = `
+                 <div class="user-profile">${replyProfile}</div>
+                 <div class="comment-content">
+                    <div>
+                        <span class="username">${commentData.reply.user}</span>
+                        <span class="timestamp">${commentData.reply.time}</span>
+                    </div>
+                    <div class="comment-text">${commentData.reply.text}</div>
+                 </div>
+            `;
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(commentDiv);
+            wrapper.appendChild(replyDiv);
+            return wrapper;
+        }
+
+        return commentDiv;
+    }
+    
+    function likeVideo() {
+        const likeBtn = document.getElementById('like-btn');
+        if(likeBtn.style.backgroundColor === 'rgb(62, 166, 255)') { // 이미 좋아요 누른 상태
+             likeCount--;
+             likeBtn.style.backgroundColor = '';
+        } else {
+             likeCount++;
+             likeBtn.style.backgroundColor = 'var(--yt-button-color)';
+        }
+        document.getElementById('like-count').textContent = likeCount.toLocaleString();
+    }
+    
+    function toggleSubscribe() {
+        const subBtn = document.getElementById('subscribe-btn');
+        isSubscribed = !isSubscribed;
+        if (isSubscribed) {
+            subBtn.textContent = '구독중';
+            subBtn.classList.add('subscribed');
+        } else {
+            subBtn.textContent = '구독';
+            subBtn.classList.remove('subscribed');
+        }
+    }
+
+    function addComment() {
+        const input = document.getElementById('comment-input');
+        if (input.value.trim() === '') return;
+
+        const newCommentData = {
+            user: "한우정",
+            profile: "우",
+            text: input.value,
+            time: "방금 전"
+        };
+        const commentElement = createCommentElement(newCommentData);
+        document.getElementById('comment-list').prepend(commentElement);
+        
+        const commentCountHeader = document.getElementById('comment-count-header');
+        let currentCount = parseInt(commentCountHeader.textContent.match(/\d+/)[0]);
+        commentCountHeader.textContent = `댓글 ${currentCount + 1}개`;
+
+        input.value = '';
+    }
+
+    window.onload = () => {
+        loadVideoList();
+        const params = new URLSearchParams(window.location.search);
+        const videoId = params.get('v');
+        if (videoId) {
+            goToVideo(parseInt(videoId));
+        }
+    };
+</script>
+
+</body>
+</html>
