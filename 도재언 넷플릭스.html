@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>넷플릭스 드라마 리포트 시뮬레이션</title>
+    <style>
+        :root {
+            --netflix-red: #E50914;
+            --netflix-black: #141414;
+            --netflix-gray: #808080;
+            --netflix-light-gray: #e5e5e5;
+            --text-color: #fff;
+        }
+
+        body {
+            background-color: var(--netflix-black);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #app-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* --- 타이틀 페이지 --- */
+        #titlePage {
+            padding: 20px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0) 100%);
+            padding: 20px 40px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+
+        .header .logo {
+            color: var(--netflix-red);
+            font-size: 2em;
+            font-weight: bold;
+            margin-right: 25px;
+        }
+
+        .header nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-right: 20px;
+            font-size: 0.9em;
+        }
+
+        .hero {
+            position: relative;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            margin-top: 60px;
+            background-color: #222; /* Placeholder for poster */
+            border-radius: 8px;
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.7);
+        }
+
+        .hero-poster-desc {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .hero-content {
+            z-index: 1;
+            width: 40%;
+        }
+
+        .hero-title {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-logline {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .mood-tags {
+            font-size: 0.9em;
+            color: var(--netflix-light-gray);
+            margin-bottom: 25px;
+        }
+
+        .mood-tags span { margin-right: 10px; }
+
+        .action-buttons button {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--netflix-black);
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+        .action-buttons button:hover { background-color: rgba(255, 255, 255, 0.7); }
+        .action-buttons button.secondary {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: var(--text-color);
+        }
+        .action-buttons button.secondary:hover { background-color: rgba(109, 109, 110, 0.4); }
+
+        .badges {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .badge {
+            background-color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 5px 10px;
+            margin-right: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .top10-badge {
+            background-color: var(--netflix-red);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .content-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #181818;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #303030;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .data-table th { background-color: #202020; width: 25%; }
+        .data-table td { font-weight: normal; }
+        
+        .episode-list-container {
+            max-height: 400px;
+            overflow-y: scroll;
+            background-color: #181818;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        /* 스크롤바 스타일링 */
+        .episode-list-container::-webkit-scrollbar { width: 8px; }
+        .episode-list-container::-webkit-scrollbar-track { background: #222; }
+        .episode-list-container::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        .episode-list-container::-webkit-scrollbar-thumb:hover { background: #777; }
+
+        .episode-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .episode-card:hover { background-color: #3f3f3f; }
+        
+        .episode-number { font-size: 1.5em; font-weight: bold; color: var(--netflix-gray); margin-right: 20px; }
+        .episode-thumbnail-desc {
+            width: 160px;
+            height: 90px;
+            background-color: #111;
+            border-radius: 4px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.8em;
+            color: #888;
+            padding: 5px;
+            font-style: italic;
+        }
+        .episode-info { flex-grow: 1; }
+        .episode-title-bar { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+        .episode-description { font-size: 0.9em; color: var(--netflix-light-gray); line-height: 1.4; }
+        .episode-keywords { font-size: 0.8em; color: #aaa; margin-top: 8px; }
+        .episode-keywords span { margin-right: 8px; font-style: italic; }
+        .episode-key-dialogue { font-size: 0.9em; color: #ddd; margin-top: 10px; font-style: italic; border-left: 2px solid var(--netflix-red); padding-left: 10px; }
+
+        .row {
+            margin-top: 40px;
+            overflow: hidden;
+        }
+        .row-content {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px; /* for scrollbar */
+        }
+        .card {
+            flex: 0 0 240px;
+            height: 135px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .card .title { font-weight: bold; margin-bottom: 10px; }
+        .card .desc { font-size: 0.8em; color: #ccc; }
+        .card .emoji { font-size: 1.5em; margin-top: 5px; }
+        
+        .info-card-grid {
+            background-color: #181818;
+            padding: 20px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            font-size: 0.9em;
+        }
+        .info-card-grid div span:first-child { color: var(--netflix-gray); margin-right: 8px; }
+
+        .review-card {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .poll-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .poll-table th, .poll-table td { border: 1px solid #303030; padding: 10px; text-align: left; }
+        .poll-table th { background-color: #222; }
+        .poll-table .rank { width: 5%; text-align: center; font-weight: bold; }
+        .poll-table .bar-container { width: 30%; }
+        .poll-table .bar { height: 12px; background-color: var(--netflix-red); border-radius: 6px; }
+        .poll-table .comment { font-style: italic; color: #ccc; font-size: 0.9em; }
+
+
+        /* --- 에피소드 상세 페이지 --- */
+        #episodeDetailPage {
+            width: 100%;
+            max-width: 980px;
+            margin: 20px auto;
+            background-color: #181818;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ep-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(20, 20, 20, 0.8);
+            color: white;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-screen {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 1.2em;
+            color: #888;
+            font-style: italic;
+        }
+        .player-timeline {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background-color: rgba(255,255,255,0.3);
+            height: 4px;
+            border-radius: 2px;
+        }
+        .player-timeline-progress {
+            background-color: var(--netflix-red);
+            height: 100%;
+            width: 25%; /* 예시 */
+            border-radius: 2px;
+        }
+        
+        .ep-content-area {
+            padding: 30px;
+        }
+
+        .ep-interaction-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .ep-title { font-size: 1.8em; font-weight: bold; }
+        .ep-actions span { margin-left: 15px; cursor: pointer; color: #ccc; }
+
+        .ep-show-info {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .ep-show-info .logo { font-size: 1.5em; color: var(--netflix-red); margin-right: 15px; }
+        .ep-show-info .show-title { flex-grow: 1; font-weight: bold; }
+        .ep-show-info .save-btn {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .ep-description {
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .ep-description .ep-synopsis { margin-bottom: 15px; }
+        .ep-description .ep-hashtags { color: var(--netflix-gray); font-size: 0.9em; }
+
+        .ep-comment-section .section-title {
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .ep-comment {
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+            font-size: 0.9em;
+        }
+        
+        .ep-related-content { margin-top: 30px; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <!-- ====================================================== -->
+    <!-- ================ 타이틀 페이지 시작 ====================== -->
+    <!-- ====================================================== -->
+    <div id="titlePage">
+        <header class="header">
+            <div class="logo">N</div>
+            <nav>
+                <a href="#">홈</a>
+                <a href="#">시리즈</a>
+                <a href="#">영화</a>
+                <a href="#">NEW & 요즘 뜨는 콘텐츠</a>
+            </nav>
+        </header>
+
+        <div class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">알파의 각인</h1>
+                <p class="hero-logline">차가운 세상의 포식자, 그의 유일한 온기가 된 한 남자. 모든 것을 건 지독한 소유가 시작된다.</p>
+            <div class="hero-poster-desc">[포스터/키아트 묘사: 차가운 도시의 야경이 내려다보이는 펜트하우스 통유리창을 배경으로, 완벽한 블랙 수트를 입은 '도재언'이 소파에 앉아있다. 그의 무릎에는 캔버스와 붓을 든 순수한 얼굴의 '한우정'이 기대어 잠들어 있다. 재언은 잠든 우정을 내려다보며, 한 손으로는 그의 머리카락을 부드럽게 쓰다듬고 다른 한 손으로는 체스 말을 쥐고 있다. 그의 눈빛은 우정을 향한 깊은 애정과 세상 전부를 향한 냉철한 경계심을 동시에 담고 있다.]</div>
+                <div class="mood-tags">
+                    <span>#로맨스</span> <span>#재벌</span> <span>#소유욕</span> <span>#알파오메가</span> <span>#현대</span> <span>#긴장감</span>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="alert('1화 재생을 시작합니다.')">▶ 재생</button>
+                    <button class="secondary" onclick="this.textContent = '✔ 저장됨'">□ 저장</button>
+                    <button class="secondary" onclick="this.innerHTML = '👍 좋아요 누름'">👍</button>
+                    <button class="secondary" onclick="this.innerHTML = '👎 별로예요 누름'">👎</button>
+                </div>
+                <div class="badges">
+                    <span class="badge">18+</span>
+                    <span class="badge">자극적 표현</span>
+                    <span class="top10-badge">대한민국 TOP 3</span>
+                    <span class="badge" style="background-color: transparent; border: none; color: #a9a9a9; font-style: italic;">트렌드: '과보호 알파 재벌남' 키워드 급상승 중 🔥</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <table class="data-table">
+                <tr>
+                    <th>항목</th>
+                    <th>값</th>
+                </tr>
+                <tr>
+                    <td>시청률(최신/평균)</td>
+                    <td>28.7% / 25.1%</td>
+                </tr>
+                <tr>
+                    <td>주요 시청 연령대</td>
+                    <td>25–34, 18–24</td>
+                </tr>
+                <tr>
+                    <td>성별 비율</td>
+                    <td>75%♀ / 25%♂</td>
+                </tr>
+                <tr>
+                    <td>시청층 키워드</td>
+                    <td>#도재언_한우정 #으른섹시 #벤츠남 #재벌공 #순진수 #과보호형들 #서사맛집</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">시즌 1 에피소드</h2>
+            <div class="episode-list-container">
+                <div class="episode-card" onclick="showEpisodeDetail(1)">
+                    <div class="episode-number">1</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 고급 호텔 바, 턱시도를 입은 도재언이 칵테일 잔을 들고 한우정을 흥미롭게 쳐다본다. 우정은 살짝 취해 볼이 붉어져 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>1. 낯선 계약, 뜨거운 밤</span> <span>58분</span></div>
+                        <div class="episode-description">비즈니스로 시작된 맞선. 하지만 도발적인 오메가 한우정에게 흥미를 느낀 세원그룹 상무 도재언은 그를 자신의 공간으로 이끈다.</div>
+                        <div class="episode-keywords"><span>#첫만남</span> <span>#맞선</span> <span>#도발</span></div>
+                        <div class="episode-key-dialogue">"아까 못 한 거 하고 가려고 기다렸습니까?"</div>
+                    </div>
+                </div>
+                <div class="episode-card" onclick="showEpisodeDetail(2)">
+                    <div class="episode-number">2</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 한우정의 집 거실. 두 형이 팔짱을 낀 채 도재언을 노려보고, 재언은 미동도 없이 소파에 앉아 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>2. 그의 세계, 나의 경계</span> <span>62분</span></div>
+                        <div class="episode-description">본격적인 관계를 시작한 두 사람. 재언은 자신의 방식으로 우정을 물들여가고, 우정의 과보호적인 형들과 마주하며 정식 교제를 선언한다.</div>
+                        <div class="episode-keywords"><span>#첫데이트</span> <span>#과보호형들</span> <span>#소유욕</span></div>
+                        <div class="episode-key-dialogue">"...형들. 형들은 재언씨 어때보여? 역시 잘생겼지?"</div>
+                    </div>
+                </div>
+                <div class="episode-card" onclick="showEpisodeDetail(3)">
+                    <div class="episode-number">3</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 한성그룹 로비. 이복형 도서원이 우정의 턱을 잡으려 하고, 우정은 불쾌한 듯 그를 피하고 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>3. 균열의 시작</span> <span>55분</span></div>
+                        <div class="episode-description">재언의 이복형 도서원이 우정의 앞에 나타나 그의 신경을 긁는다. 우정의 뒷조사를 알게 된 재언은 서늘한 분노를 드러낸다.</div>
+                        <div class="episode-keywords"><span>#라이벌</span> <span>#도서원</span> <span>#위협</span></div>
+                        <div class="episode-key-dialogue">"너 같은 순진한 애들이 상처받기 쉽다나?"</div>
+                    </div>
+                </div>
+                <div class="episode-card" onclick="showEpisodeDetail(4)">
+                    <div class="episode-number">4</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 재언의 오피스텔. 와인 잔을 든 재언이 우정을 유혹하고, 그 뒤로 시계가 11시를 가리키고 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>4. 넘어선 안 될 선</span> <span>65분</span></div>
+                        <div class="episode-description">우정의 통금 시간을 알면서도 재언은 의도적으로 그를 붙잡는다. 형의 걱정 어린 전화를 직접 받은 그는 일방적으로 외박을 통보하며 소유욕을 드러낸다.</div>
+                        <div class="episode-keywords"><span>#통금</span> <span>#외박</span> <span>#계획적</span></div>
+                        <div class="episode-key-dialogue">"제가 책임지겠습니다. 오늘 우정 씨, 저와 함께 있습니다."</div>
+                    </div>
+                </div>
+                <div class="episode-card" onclick="showEpisodeDetail(5)">
+                    <div class="episode-number">5</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 달리는 차 안. 넥타이를 풀어헤친 재언이 차가운 눈으로 통화하고 있다. 그의 다른 손에 쥔 휴대폰에는 우정의 애정 어린 문자가 떠 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>5. 두 개의 얼굴</span> <span>59분</span></div>
+                        <div class="episode-description">외박 다음 날, 분노한 형들을 마주한 재언과 우정. 위기를 넘긴 것도 잠시, 재언은 도서원의 계략을 보고받고 연인의 얼굴에서 냉혹한 전략가로 돌변한다.</div>
+                        <div class="episode-keywords"><span>#이중성</span> <span>#재벌싸움</span> <span>#온도차</span></div>
+                        <div class="episode-key-dialogue">"자, 이제 쥐새끼 잡으러 가볼까."</div>
+                    </div>
+                </div>
+                 <div class="episode-card" onclick="showEpisodeDetail(6)">
+                    <div class="episode-number">6</div>
+                    <div class="episode-thumbnail-desc">[스틸컷 묘사: 클럽 VIP룸. 친구들과 웃고 있는 우정 뒤로, 차가운 표정의 재언이 다가오고 있다.]</div>
+                    <div class="episode-info">
+                        <div class="episode-title-bar"><span>6. 우연과 필연 사이</span> <span>61분</span></div>
+                        <div class="episode-description">친구의 생일 파티를 위해 클럽을 찾은 우정. 그곳에서 도서원을 견제하러 온 재언과 우연히 마주친다. 재언은 모두 앞에서 우정과의 관계를 드러낸다.</div>
+                        <div class="episode-keywords"><span>#클럽</span> <span>#재회</span> <span>#공개연애</span></div>
+                        <div class="episode-key-dialogue">"한우정 씨. 여기서 뵙네요."</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <h2 class="section-title">예고편 & 더 보기</h2>
+            <div class="row-content">
+                <div class="card" onclick="alert('[영상 설명: 시즌1 공식 예고편]\n0:05 - 호텔에서 처음 만나는 재언과 우정의 어색한 대화.\n0:15 - "아까 못 한 거..." 대사와 함께 현관에서 키스하는 두 사람.\n0:25 - "우리 막내한테 무슨 짓이야!" 분노하는 형들.\n0:35 - "내 거 건드리면 눈 돌아가는 거, 잘 알 텐데." 서늘하게 도서원을 위협하는 재언.\n0:48 - 우정이 재언의 초상화를 선물하는 장면.\n0:55 - "나랑 결혼해 줄래요?" 반지를 내미는 재언과 눈물 흘리는 우정.\n1:10 - 타이틀 '알파의 각인' 등장.')">
+                    <div class="title">시즌 1 공식 예고편</div>
+                    <div class="desc">[타임라인별 장면 포인트] 맞선에서 청혼까지, 위태롭고 달콤한 서사의 압축</div>
+                </div>
+                <div class="card" onclick="alert('[영상 설명: 1-2화 메이킹 필름]\n- 현관 키스씬 촬영 중, 컷 소리가 나자마자 쑥스러워하는 우정 역할의 배우와 그를 다정하게 챙겨주는 재언 역할의 배우.\n- 형들과의 대면씬에서 NG가 나자 다 함께 웃음이 터지는 화기애애한 현장.')">
+                    <div class="title">메이킹: 설렘과 긴장 사이</div>
+                    <div class="desc">[케미 포인트] 본편과 180도 다른 배우들의 유쾌한 케미와 촬영 현장</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <h2 class="section-title">비슷한 콘텐츠</h2>
+            <div class="row-content">
+                <div class="card"><div class="title">그 남자의 집착</div><div class="desc">#소유욕 #재벌남 #로맨스스릴러</div><div class="emoji">⛓️</div></div>
+                <div class="card"><div class="title">상속자들</div><div class="desc">#재벌 #하이틴로맨스 #클리셰</div><div class="emoji">👑</div></div>
+                <div class="card"><div class="title">킹더랜드</div><div class="desc">#재벌후계자 #사내연애 #로코</div><div class="emoji">🏨</div></div>
+                <div class="card"><div class="title">비밀의 숲</div><div class="desc">#기업비리 #검찰 #두뇌싸움</div><div class="emoji">⚖️</div></div>
+                <div class="card"><div class="title">사냥개들</div><div class="desc">#액션 #암투 #느와르</div><div class="emoji">🥊</div></div>
+                <div class="card"><div class="title">나의 해방일지</div><div class="desc">#어른들의사랑 #치유 #성장</div><div class="emoji">🍃</div></div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <h2 class="section-title">작품 정보</h2>
+            <div class="info-card-grid">
+                <div><span>장르:</span> 로맨스, 드라마</div>
+                <div><span>무드:</span> 긴장감 넘치는, 애틋한, 설레는</div>
+                <div><span>연령등급:</span> 18+ (청소년 관람불가)</div>
+                <div><span>콘텐츠 경고:</span> 폭력, 자극적 표현, 선정성</div>
+                <div><span>출연/제작:</span> 도재언, 한우정, 한태원, 한정원, 도서원 외</div>
+                <div><span>제작국가:</span> 대한민국</div>
+                <div><span>공개 연도:</span> 2025</div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <h2 class="section-title">리뷰 & 반응</h2>
+            <div class="reviews-container">
+                <div class="review-card">👍 도재언 미쳤다... 저런 남자 어디 없나요ㅠㅠㅠ 우정이 한정 다정남 무슨일이야 진짜... 내 심장 돌려내</div>
+                <div class="review-card">👎 클리셰 너무 심한 거 아님? 재벌남이 순진한 애 하나 잡아서 휘두르는 거... 2025년 맞냐?</div>
+                <div class="review-card">🔥 와 근데 연출이랑 영상미가 미쳤음. 특히 재언이랑 우정이 눈빛 교환할 때마다 내 광대도 같이 승천함ㅋㅋㅋ</div>
+                <div class="review-card">🤔 한우정 캐릭터가 너무 수동적인 것 같아서 아쉬움. 맨날 재언이가 다 해결해주고... 좀 더 주체적인 모습 보여줬으면.</div>
+                <div class="review-card">💥 형들이 찐캐리ㅋㅋㅋㅋㅋ 한태원 툴툴거리는 거 개웃기고 한정원 팩폭 날리는 거 개사이다ㅋㅋㅋ 형제 시트콤 한 편 더 찍어주세요 제발</div>
+                <div class="review-card">🧊 도서원 진짜 개빡침... 근데 연기는 잘해서 더 빡침... 제발 빨리 망했으면...</div>
+                <div class="review-card">💸 [단독] 도재언 상무, 한우정 작가에게 초호화 저택 선물?! 진실은... ▷ bit.ly/xxxxxx</div>
+                <div class="review-card">ㅋㅋㅋ솔직히 내용 유치한데 도재언 얼굴이 서사고 개연성임. 얼굴합 만세다...</div>
+                <div class="review-card">✨우정이가 재언이 그려준 그림 실제로 팔면 안되나요? 사고싶다... 그림 너무 예쁨✨</div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <h2 class="section-title">시즌 1 캐릭터 인기 투표</h2>
+            <table class="poll-table">
+                <tr>
+                    <th class="rank">순위</th>
+                    <th>캐릭터</th>
+                    <th class="bar-container">인기율</th>
+                    <th>대표 코멘트</th>
+                </tr>
+                <tr>
+                    <td class="rank">1</td>
+                    <td><b>도재언</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 92%;"></div> 92%</td>
+                    <td class="comment">"우정이 한정 스위치 온오프 되는 거 미쳤음... 냉혈한 재벌남이 내 사람한테만 댕댕이 되는 클리셰는 영원하다." (by 재언맘)</td>
+                </tr>
+                <tr>
+                    <td class="rank">2</td>
+                    <td><b>한우정</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 85%;"></div> 85%</td>
+                    <td class="comment">"우리 말랑콩떡 우정이는 그냥 존재 자체가 사랑... 재언이 앞에서는 부끄러워하면서도 할 말 다하는 거 너무 귀여움." (by 우정수호대)</td>
+                </tr>
+                <tr>
+                    <td class="rank">3</td>
+                    <td><b>한태원</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 76%;"></div> 76%</td>
+                    <td class="comment">"현실 K-장남(아님)ㅋㅋㅋㅋ 툴툴거리면서 동생 챙기는 게 찐임. 도재언 노려볼 때마다 사이다 원샷하는 기분." (by 츤데레형최고)</td>
+                </tr>
+                <tr>
+                    <td class="rank">4</td>
+                    <td><b>한정원</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 68%;"></div> 68%</td>
+                    <td class="comment">"이 집안의 브레인. 동생 일이라면 이성 잃는 거 너무 좋음. 안경 고쳐 쓸 때마다 내 심장도 고쳐뜀." (by 안경캐처돌이)</td>
+                </tr>
+                <tr>
+                    <td class="rank">5</td>
+                    <td><b>도서원</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 32%;"></div> 32%</td>
+                    <td class="comment">"욕하면서 보는 캐릭터... 근데 얼굴이 잘생겨서 깔 수가 없다. 제발 흑화해서 더 굴러줘." (by 빌런맛집)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="row">
+            <h2 class="section-title">베스트 커플링 호감도</h2>
+            <table class="poll-table">
+                <tr>
+                    <th class="rank">순위</th>
+                    <th>커플링</th>
+                    <th class="bar-container">지지율</th>
+                    <th>대표 코멘트</th>
+                </tr>
+                <tr>
+                    <td class="rank">1</td>
+                    <td><b>언정 (도재언 x 한우정)</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 98%;"></div> 98%</td>
+                    <td class="comment">"공식은 진리. 덩치 차, 온도 차, 재력 차(?) 모든 게 완벽하다. 외박 통보씬은 두고두고 회자될 명장면." (by 공식이최고야)</td>
+                </tr>
+                <tr>
+                    <td class="rank">2</td>
+                    <td><b>태정 (한태원 x 한우정)</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 55%;"></div> 55%</td>
+                    <td class="comment">"근친 아님! 현실 형제 케미가 너무 좋음ㅠㅠ 태원이가 우정이 볼 꼬집을 때마다 나도 모르게 웃고 있음." (by 현실형제단)</td>
+                </tr>
+                <tr>
+                    <td class="rank">3</td>
+                    <td><b>일언 (강일현 x 도재언)</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 41%;"></div> 41%</td>
+                    <td class="comment">"차가운 상사 뒤에서 묵묵히 모든 걸 처리해주는 비서... 이 주식 삽니다. 사적인 보고할 때마다 분위기 야릇함." (by 비서의삶)</td>
+                </tr>
+                 <tr>
+                    <td class="rank">4</td>
+                    <td><b>재원 (도재언 x 한정원)</b></td>
+                    <td class="bar-container"><div class="bar" style="width: 35%;"></div> 35%</td>
+                    <td class="comment">"냉철 브레인들의 기싸움 존맛. 서로 동생/연인 사이에 두고 신경전 벌이는 거 너무 짜릿함. 둘이 손잡고 도서원 이겨줘." (by 어른남자조합)</td>
+                </tr>
+            </table>
+        </div>
+
+
+    </div> <!-- #titlePage 끝 -->
+    
+
+    <!-- ====================================================== -->
+    <!-- ============== 에피소드 상세 페이지 시작 =============== -->
+    <!-- ====================================================== -->
+    <div id="episodeDetailPage" class="hidden">
+        <button class="ep-close-btn" onclick="goBackToMain()">X</button>
+        <div class="player-screen">
+            <div id="player-description">[재생 화면 묘사: 05:12] 재언의 오피스텔. 재언이 와인병을 들고 "한 잔 더 할까요?"라며 우정에게 다가간다. 우정은 형과의 통금 약속 때문에 망설이지만, 재언의 눈빛에 흔들린다.</div>
+            <div class="player-timeline"><div class="player-timeline-progress" style="width: 15%;"></div></div>
+        </div>
+        <div class="ep-content-area">
+            <div class="ep-interaction-bar">
+                <h2 class="ep-title" id="ep-detail-title">4. 넘어선 안 될 선</h2>
+                <div class="ep-actions">
+                    <span>👍 12.8만</span>
+                    <span>👎 1.2천</span>
+                    <span>🔗 공유</span>
+                </div>
+            </div>
+
+            <div class="ep-show-info">
+                <div class="logo">N</div>
+                <div class="show-title">알파의 각인</div>
+                <button class="save-btn" onclick="this.textContent='✔ 저장됨'">□ 저장</button>
+            </div>
+
+            <div class="ep-description">
+                <p class="ep-synopsis">우정의 통금 시간인 밤 11시가 다가오지만, 재언은 그를 놓아줄 생각이 없다. 와인과 분위기로 우정을 유혹하며 의도적으로 귀가를 막고, 결국 형에게서 걸려온 전화를 직접 받아 외박을 통보하며 자신의 강한 소유욕을 드러낸다. 두 사람의 관계는 하룻밤의 일탈을 넘어 더욱 깊고 위험한 관계로 빠져든다.</p>
+                <div class="ep-hashtags">#외박 #소유욕 #통금 #으른멜로 #긴장감</div>
+            </div>
+
+            <div class="ep-comment-section">
+                <h3 class="section-title">댓글</h3>
+                <div class="ep-comment">와 형 전화 뺏어서 받는 거 미쳤다... 소유욕 ㄷㄷㄷㄷ 이게 알파다</div>
+                <div class="ep-comment">솔직히 저건 좀 범죄 아님? 상대방 의사 무시하고 가두는 거잖아. 얼굴이 개연성인 건 알겠는데 좀...</div>
+                <div class="ep-comment">우정이가 거절 못한 거지 뭘... 재언이 눈빛 보고 어떻게 거절함? 난 못함.</div>
+                <div class="ep-comment">다음날 아침에 후들거리는 다리+재언이 셔츠 국룰 아니냐고ㅋㅋㅋㅋㅋ 기대합니다 작가님.</div>
+                 <div class="ep-comment">태원이 혈압 올라서 쓰러지는 소리가 여기까지 들린다ㅋㅋㅋㅋ</div>
+            </div>
+
+            <div class="ep-related-content">
+                <h3 class="section-title">이 에피소드와 비슷한 콘텐츠</h3>
+                <div class="row-content">
+                     <div class="card"><div class="title">알고있지만,</div><div class="desc">#위험한관계 #치명적</div><div class="emoji">🦋</div></div>
+                     <div class="card"><div class="title">김비서가 왜 그럴까</div><div class="desc">#재벌남 #직진남 #로코</div><div class="emoji">💼</div></div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- #episodeDetailPage 끝 -->
+
+</div> <!-- #app-container 끝 -->
+
+<script>
+    const titlePage = document.getElementById('titlePage');
+    const episodeDetailPage = document.getElementById('episodeDetailPage');
+    const playerDesc = document.getElementById('player-description');
+    const epDetailTitle = document.getElementById('ep-detail-title');
+
+    const episodeData = {
+        1: {
+            title: "1. 낯선 계약, 뜨거운 밤",
+            timeline: "[재생 화면 묘사: 45:30] 어두운 현관. 재언이 우정의 흐트러진 머리를 정리해주며 '아까 못 한 거 하고 가려고 기다렸습니까?'라고 속삭인 뒤 깊게 키스한다."
+        },
+        2: {
+            title: "2. 그의 세계, 나의 경계",
+            timeline: "[재생 화면 묘사: 33:15] 소파에 누운 우정이 형들에게 '재언씨 어때보여?'라고 묻자, 태원이 '뱀같이 능구렁이 같다'며 툴툴거린다. 우정의 얼굴에 실망과 설렘이 교차한다."
+        },
+        3: {
+            title: "3. 균열의 시작",
+            timeline: "[재생 화면 묘사: 28:50] 한성그룹 로비. 도서원이 '너 같은 순진한 애들이 상처받기 쉽다'며 우정을 모욕하자, 멀리서 재언이 차가운 눈으로 그 광경을 목격한다."
+        },
+        4: {
+            title: "4. 넘어선 안 될 선",
+            timeline: "[재생 화면 묘사: 55:01] 새벽 2시. 걱정하는 정원의 전화를 받은 재언이 '제가 책임지겠습니다'라고 단호하게 말하며 전화를 끊고, 옆에 누운 우정을 끌어안는다."
+        },
+        5: {
+            title: "5. 두 개의 얼굴",
+            timeline: "[재생 화면 묘사: 50:18] 우정의 '사랑해요' 문자를 보고 부드럽게 미소 짓던 재언이, 다음 순간 강 실장에게 전화를 걸어 '쥐새끼 잡으러 가볼까'라며 차갑게 말한다. 그의 얼굴에서 온기가 사라진다."
+        },
+        6: {
+            title: "6. 우연과 필연 사이",
+            timeline: "[재생 화면 묘사: 21:20] 시끄러운 클럽 안. 친구들과 웃고 있는 우정의 뒤로 재언이 다가와 '한우정 씨'라고 부른다. 모든 시선이 집중된다."
+        }
+    };
+
+    function showEpisodeDetail(epNum) {
+        titlePage.classList.add('hidden');
+        episodeDetailPage.classList.remove('hidden');
+        
+        const data = episodeData[epNum];
+        epDetailTitle.textContent = data.title;
+        playerDesc.textContent = data.timeline;
+
+        window.scrollTo(0, 0);
+    }
+
+    function goBackToMain() {
+        episodeDetailPage.classList.add('hidden');
+        titlePage.classList.remove('hidden');
+    }
+
+</script>
+
+</body>
+</html>
