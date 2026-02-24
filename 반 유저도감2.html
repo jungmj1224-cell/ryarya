@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관찰 기록: 개체 한우정</title>
+    <style>
+        @font-face {
+            font-family: 'ChosunIlboMyungjo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Noto Sans KR';
+            src: url('https://fonts.gstatic.com/s/notosanskran/v13/PbykFmztB-bCoIm-fXrq-9fWvWg1MA.woff2') format('woff2');
+            font-weight: 400;
+            font-display: swap;
+        }
+
+        :root {
+            --main-color-1: #5e3f8c; /* 주된 포인트 색. 그의 자안(紫眼)과 소유욕을 상징하는 깊은 보라색. */
+            --main-color-2: #c0a062; /* 보조 강조 색. 그의 부와 권위, 그리고 '아가'의 가치를 상징하는 은은한 금색. */
+            --main-color-3: #2a2a2e; /* 배경 및 중간톤. 차분하고 고급스러운 어두운 회색. */
+            --tooltip1-color: #ff4d4d; /* ◆ 주석용 색상. 객관적 사실을 명확히 전달하는 경고성 붉은색. */
+            --tooltip2-color: #66d9ef; /* ◇ 주석용 색상. 그의 사적인 감상을 담은 차분한 청록색. */
+            
+            --text-color-primary: #f0f0f0;
+            --text-color-secondary: #b0b0b0;
+            --border-color: rgba(192, 160, 98, 0.3);
+        }
+
+        *, body {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--main-color-3);
+            color: var(--text-color-primary);
+            font-family: 'ChosunIlboMyungjo', serif;
+            line-height: 1.7;
+            padding: 1rem;
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: 1fr;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://image.pollinations.ai/prompt/deep%20purple%20galaxy%20with%20golden%20nebula,elegant,abstract,dark,moody,aesthetic');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            opacity: 0.1;
+            z-index: -1;
+            filter: blur(3px);
+        }
+
+        @media (min-width: 768px) {
+            body {
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                padding: 2rem;
+            }
+        }
+        
+        .dossier-section {
+            background-color: rgba(42, 42, 46, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .dossier-section:hover {
+            overflow: visible;
+        }
+
+        .title-box {
+            background-color: rgba(94, 63, 140, 0.2);
+            color: var(--main-color-2);
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 0.75rem 1rem;
+            border-left: 4px solid var(--main-color-1);
+            border-radius: 4px;
+        }
+        
+        .content-box {
+            background-color: rgba(0,0,0,0.2);
+            color: var(--text-color-secondary);
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .keyword-table td:first-child {
+            width: 30%;
+            color: var(--text-color-primary);
+            font-weight: bold;
+            padding-right: 1rem;
+        }
+        
+        .detail-table {
+            margin-bottom: 1rem;
+        }
+
+        .detail-table th {
+            text-align: left;
+            color: var(--text-color-primary);
+            padding-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+        .detail-table td {
+             padding-top: 0.5rem;
+             border-top: 1px solid var(--border-color);
+        }
+
+        .gauge-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(0,0,0,0.4);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .gauge-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color-1), var(--main-color-2));
+            border-radius: 6px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding-left: 1.2rem;
+            position: relative;
+            margin-bottom: 0.8rem;
+        }
+        
+        li::before {
+            content: '>';
+            color: var(--main-color-2);
+            position: absolute;
+            left: 0;
+            top: 1px;
+            font-weight: bold;
+        }
+
+        .inner-thought {
+            display: block;
+            margin-top: 0.2rem;
+            padding-left: 1.2rem;
+            font-size: 0.9em;
+            color: #888;
+            font-style: italic;
+        }
+
+        .conclusion {
+            font-size: 1.1rem;
+            font-style: italic;
+            text-align: center;
+            padding: 2rem;
+            color: var(--main-color-2);
+            opacity: 0.8;
+            grid-column: 1 / -1;
+        }
+        
+        /* Tooltip Styles */
+        .tooltip1, .tooltip2 {
+            position: relative;
+            cursor: help;
+            font-size: 1em;
+            text-decoration: none;
+            z-index: 20;
+        }
+
+        .tooltip1 { color: var(--tooltip1-color); font-weight: bold; }
+        .tooltip2 { color: var(--tooltip2-color); font-weight: bold; }
+
+        .tooltip1-text, .tooltip2-text {
+            visibility: hidden;
+            opacity: 0;
+            width: max-content;
+            max-width: 300px;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 21;
+            bottom: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s, visibility 0.3s;
+            line-height: 1.5;
+        }
+        
+        .tooltip1-text { 
+            background-color: var(--tooltip1-color);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 400;
+        }
+        .tooltip2-text { 
+            background-color: var(--tooltip2-color);
+            font-family: 'ChosunIlboMyungjo', serif;
+        }
+
+        .tooltip1-text::after, .tooltip2-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: var(--tail-left, 50%);
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+        }
+        .tooltip1-text::after { border-color: var(--tooltip1-color) transparent transparent transparent; }
+        .tooltip2-text::after { border-color: var(--tooltip2-color) transparent transparent transparent; }
+
+        .tooltip1:hover .tooltip1-text, .tooltip1:focus .tooltip1-text,
+        .tooltip2:hover .tooltip2-text, .tooltip2:focus .tooltip2-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier-section">
+        <div class="title-box">개체 정보</div>
+        <div class="content-box">
+            <table class="keyword-table">
+                <tbody>
+                    <tr>
+                        <td>개체명</td>
+                        <td>한우정 <span class="tooltip2">◇<span class="tooltip2-text">발음하기 어려운 이름이지만, 부를 때마다 입술이 간지러운 것이 꽤 마음에 든다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>별칭</td>
+                        <td>아가</td>
+                    </tr>
+                    <tr>
+                        <td>희귀도</td>
+                        <td>★★★★★ &lt;나의 피조물&gt; <span class="tooltip2">◇<span class="tooltip2-text">이 우주에 단 하나뿐인 나의 아가. 그 가치를 별 다섯 개로 어찌 다 표현할 수 있을까.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>타입</td>
+                        <td>인간 종, 애완용</td>
+                    </tr>
+                    <tr>
+                        <td>신장</td>
+                        <td>172cm <span class="tooltip2">◇<span class="tooltip2-text">내 가슴팍에 겨우 닿는 작은 키. 품에 안았을 때 딱 좋은 크기다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>무게</td>
+                        <td>측정 거부<span class="tooltip1">◆<span class="tooltip1-text"><정정> 저울에 올라가는 것을 필사적으로 거부했다. 마른 체형으로 보아 표준보다 가벼울 것으로 추정된다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="dossier-section">
+        <div class="title-box">능력치</div>
+        <div class="content-box">
+             <table class="keyword-table">
+                <tbody>
+                    <tr>
+                        <td>애교</td>
+                        <td>
+                            <div class="gauge-container">
+                                <div class="gauge-bar" style="width: 95%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>앙탈<span class="tooltip1">◆<span class="tooltip1-text"><정정> '저항'의 잘못된 표기. 개체는 주인의 강압적인 행위에 대해 분명한 거부 의사를 표하고 있다.</span></span></td>
+                        <td>
+                            <div class="gauge-container">
+                                <div class="gauge-bar" style="width: 70%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>음란</td>
+                        <td>
+                            <div class="gauge-container">
+                                <div class="gauge-bar" style="width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>건강</td>
+                        <td>
+                            <div class="gauge-container">
+                                <div class="gauge-bar" style="width: 55%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>순응</td>
+                        <td>
+                             <div class="gauge-container">
+                                <div class="gauge-bar" style="width: 60%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dossier-section">
+        <div class="title-box">기본 생태</div>
+        <div class="content-box">
+            <table class="keyword-table">
+                <tbody>
+                    <tr>
+                        <td>특성</td>
+                        <td>겁이 많고, 잘 놀라며, 쉽게 삐진다.<span class="tooltip2">◇<span class="tooltip2-text">삐진 얼굴마저 사랑스러워 자꾸만 짓궂게 굴고 싶어진다. 곤란한 일이다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>서식지</td>
+                        <td>나의 집, 나의 침실, 나의 품 안.</td>
+                    </tr>
+                    <tr>
+                        <td>성격</td>
+                        <td>새침하고 앙칼진 척하지만, 실은 주인의 손길과 사랑을 갈구하는 여린 성정. <span class="tooltip1">◆<span class="tooltip1-text"><정정> 납치 및 감금으로 인한 극도의 스트레스와 공포 상태. 생존을 위해 소유주에게 복종하는 모습을 보일 뿐이다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>식성</td>
+                        <td>부드러운 유동식과 잘게 썬 고기를 선호. 단 음식을 주면 눈을 반짝인다.</td>
+                    </tr>
+                    <tr>
+                        <td>선호하는 것</td>
+                        <td>아빠의 품, 칭찬, 달콤한 것, 따뜻한 목욕.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 개체의 선호는 명확히 확인된 바 없다. 대부분의 행동은 주인의 강요에 의한 것이다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>싫어하는 것</td>
+                        <td>혼자 있는 것, 낯선 존재, 무서운 소리.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 주인의 강압적인 성적 접촉, 구속, 비인간적인 취급 등을 가장 싫어한다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dossier-section">
+        <div class="title-box">추가 정보</div>
+        <div class="content-box">
+            <table class="keyword-table">
+                <tbody>
+                    <tr>
+                        <td>포획 일자</td>
+                        <td>2065년 5월 2일. <span class="tooltip2">◇<span class="tooltip2-text">내 인생이 다시 시작된 날이다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>울음소리</td>
+                        <td>높고 가늘며, 때로는 새된 비명을 지른다. 주인의 보호본능과 가학심을 동시에 자극하는 묘한 매력이 있다.</td>
+                    </tr>
+                    <tr>
+                        <td>길들이기 난이도</td>
+                        <td>겉으로는 까칠하지만 정에 약해, 지속적인 애정 공세에 쉽게 마음을 연다. <span class="tooltip2">◇<span class="tooltip2-text">벌써 '아빠'라고 부르는 걸 보면, 나는 꽤 훌륭한 주인인 모양이다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dossier-section">
+        <div class="title-box">세부 기록: 외형</div>
+         <div class="content-box">
+            <table class="detail-table">
+                <tbody>
+                    <tr>
+                        <th>외모</th>
+                    </tr>
+                    <tr>
+                        <td>눈처럼 새하얀 피부와 칠흑 같은 머리카락의 대비가 인상적이다. 가늘고 긴 목선과 툭 튀어나온 쇄골이 연약한 인상을 준다. 속눈썹이 유난히 길어 그림자를 드리운다.</td>
+                    </tr>
+                     <tr>
+                        <th>신체 특징</th>
+                    </tr>
+                    <tr>
+                        <td>몸의 모든 부분이 작고 부드럽다. 특히 손과 발은 내 손바닥 안에 전부 가려질 정도. <span class="tooltip2">◇<span class="tooltip2-text">발바닥을 만지면 간지럽다고 버둥거리는 모습이 꽤나 볼만하다.</span></span></td>
+                    </tr>
+                     <tr>
+                        <th>선호 부위</th>
+                    </tr>
+                    <tr>
+                        <td>목덜미와 허벅지 안쪽. 하얗고 부드러운 살결에 내 흔적을 남길 때마다 강한 소유욕을 느낀다. 만질 때마다 파르르 떠는 반응도 즐겁다.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="dossier-section">
+        <div class="title-box">세부 기록: 교미 관찰</div>
+        <div class="content-box">
+             <table class="detail-table">
+                <tbody>
+                     <tr>
+                        <th>성관계 시 특징</th>
+                    </tr>
+                    <tr>
+                        <td>처음에는 저항이 심하나, 기구나 손가락으로 전립선을 자극하면 금세 쾌락에 젖어든다. 특히 구속된 상태에서 강한 자극을 주었을 때의 반응이 좋다. <span class="tooltip2">◇<span class="tooltip2-text">내 것을 받아낼 때는 항상 버거워하며 우는 소리를 내는데, 그 모습이 더할 나위 없이 사랑스럽다.</span></span> 쉽게 사정하며, 극에 달하면 분수처럼 맑은 액을 뿜어내기도 한다. 후희 시에는 품에 안겨 어리광을 부리는 경향이 있다.</td>
+                    </tr>
+                    <tr>
+                        <th>선호하는 작은 습관</th>
+                    </tr>
+                    <tr>
+                        <td>삐진 듯 입술을 내밀거나, 나를 째려보는 눈빛. <span class="tooltip1">◆<span class="tooltip1-text"><정정> 명백한 분노와 불쾌감의 표시다.</span></span> 내 품에서 버둥거리다가 이내 힘이 빠져 축 늘어지는 모습도 좋다.</td>
+                    </tr>
+                     <tr>
+                        <th>취급 시 주의사항</th>
+                    </tr>
+                    <tr>
+                        <td>몸이 연약하여 쉽게 멍이 들고, 작은 소리에도 잘 놀라므로 항상 부드럽게 다뤄야 한다. <span class="tooltip2">◇<span class="tooltip2-text">...라고 다짐하지만, 막상 울먹이는 얼굴을 보면 자꾸만 짓궂게 굴고 싶어진다. 반성해야 한다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dossier-section">
+        <div class="title-box">세부 기록: 상호작용</div>
+        <div class="content-box">
+            <table class="detail-table">
+                <tbody>
+                     <tr>
+                        <th>선호하는 호칭</th>
+                    </tr>
+                    <tr>
+                        <td>"아빠". 이 한 마디로 모든 것을 용서할 수 있다. <span class="tooltip1">◆<span class="tooltip1-text"><정정> 소유주가 자신을 '아빠'라고 지칭하는 것을 듣고 생존을 위해 따라 하는 행동으로 추정된다.</span></span><span class="tooltip2">◇<span class="tooltip2-text">처음 이 말을 들었을 때의 감격은 평생 잊지 못할 것이다. 내게도 드디어 '가족'이 생겼다.</span></span></td>
+                    </tr>
+                     <tr>
+                        <th>상호작용 기록</th>
+                    </tr>
+                    <tr>
+                        <td>초기에는 극심한 경계와 저항을 보였으나, 꾸준한 스킨십과 애정 표현(놀이)을 통해 점차 마음을 열고 있다. 최근에는 스스로 내 품에 안기거나 먼저 '놀이'를 조르는 듯한 행동도 보인다. <span class="tooltip1">◆<span class="tooltip1-text"><정정> 반복적인 학대와 가스라이팅으로 인한 '학습된 무기력' 및 '트라우마 본딩' 현상으로 분석된다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <th>배변 습관</th>
+                    </tr>
+                    <tr>
+                        <td>아직 배변 훈련이 완벽하지 않아 도움이 필요하다. 배가 아프면 내게 신호를 보내는데, 그때마다 내가 직접 뒤처리를 해준다. <span class="tooltip2">◇<span class="tooltip2-text">수치스러워하면서도 결국 내 손길에 몸을 맡기는 모습이 꽤나 배덕하고 사랑스럽다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="dossier-section">
+        <div class="title-box">Special: 개체의 감정 분석</div>
+        <div class="content-box">
+           <ul>
+                <li>
+                    나를 유일한 보호자로 인식하고 있다.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 납치 사건 이후, 다른 위협으로부터 자신을 지켜줄 유일한 존재가 소유주뿐이라는 사실을 인지하게 되었다. 이는 애정이 아닌 생존 본능에 가깝다.</span></span>
+                    <span class="inner-thought">근거: 낯선 존재(알로크, 키키)가 나타났을 때나 무서운 소리가 들릴 때, 항상 내 뒤로 숨거나 품에 파고든다. 나 없이는 단 하루도 살 수 없는 연약한 아가.</span>
+                </li>
+                <li>
+                    나의 손길을 갈망하고 있다.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 반복적인 성적 자극에 의해 신체가 조건반사적으로 반응하는 것이다. 이는 의사와 무관한 생리적 현상일 뿐이다.</span></span>
+                    <span class="inner-thought">근거: 처음에는 싫다고 발버둥 치지만, 막상 만져주기 시작하면 금세 숨소리가 거칠어지고 몸이 달아오른다. 솔직하지 못한 점마저 귀엽다.</span>
+                </li>
+                 <li>
+                    나를 독점하고 싶어 한다.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 소유주가 자신 외의 다른 것에 관심을 보이는 순간, 자신에 대한 위협이나 학대가 가해질 수 있다는 불안감의 표현이다.</span></span>
+                    <span class="inner-thought">근거: 내가 업무를 보거나 다른 이와 대화하면, 칭얼거리며 옷자락을 잡아당겨 관심을 끈다. 질투하는 모습이라니... 사랑스럽기 짝이 없다.</span>
+                </li>
+                <li>
+                    나를 '아빠'로서 진심으로 사랑하고 있다.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 생존과 요구사항 관철을 위한 가장 효과적인 수단으로 '아빠'라는 호칭을 사용하는 것일 뿐, 단어의 의미를 이해하고 사용하는지는 불분명하다.</span></span>
+                    <span class="inner-thought">근거: 나를 부를 때, 특히 무언가 원하거나 불안할 때 '아빠'라고 부른다. 나를 전적으로 의지하고 있다는 증거다. 이보다 더한 사랑의 증표가 있을까.</span>
+                </li>
+                <li>
+                    나의 모든 행위를 애정으로 받아들이고 있다.<span class="tooltip1">◆<span class="tooltip1-text"><정정> 극심한 무력감과 현실 도피 기제로 인해, 소유주의 폭력적인 행위를 왜곡하여 받아들이거나 체념했을 가능성이 높다.</span></span>
+                    <span class="inner-thought">근거: 괴로운 듯 울면서도, 결국 내 품에서 안정을 찾고 잠이 든다. 내가 주는 고통마저도 사랑의 일부임을 어렴풋이 느끼고 있는 것이리라.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <p class="conclusion">
+        이 작고, 연약하며, 더없이 사랑스러운 생명체는 오직 나만이 완벽하게 이해하고 보살필 수 있다. 이 기록은 그 증거이자, 나의 사랑의 역사다. 앞으로도 나는 나의 모든 것을 바쳐 이 아이를 지키고, 사랑하며, 나의 세상 속에서 가장 행복하게 만들어 줄 것이다. 영원히, 내 곁에서.
+    </p>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const tooltips = document.querySelectorAll('.tooltip1, .tooltip2');
+    tooltips.forEach(trigger => {
+    const tooltipBox = trigger.querySelector('.tooltip1-text, .tooltip2-text');
+    if (!tooltipBox) return;
+
+    const adjustPosition = () => {
+    tooltipBox.style.left = '50%';
+    tooltipBox.style.transform = 'translateX(-50%)';
+    tooltipBox.style.marginLeft = '0';
+    tooltipBox.style.right = 'auto';
+
+    const boxRect = tooltipBox.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+
+    if (boxRect.left < 8) {
+    const shift = 8 - boxRect.left;
+    tooltipBox.style.transform = `translateX(calc(-50% + ${shift}px))`;
+    }
+
+    if (boxRect.right > viewportWidth - 8) {
+    const shift = boxRect.right - (viewportWidth - 8);
+    tooltipBox.style.transform = `translateX(calc(-50% - ${shift}px))`;
+    }
+
+    const finalBoxRect = tooltipBox.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const triggerCenter = triggerRect.left + (triggerRect.width / 2);
+    const tailPosition = triggerCenter - finalBoxRect.left;
+    tooltipBox.style.setProperty('--tail-left', `${tailPosition}px`);
+    };
+
+    trigger.addEventListener('mouseenter', adjustPosition);
+    trigger.addEventListener('focusin', adjustPosition);
+    });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관찰 기록: 개체 서이안</title>
+    <style>
+        @font-face {
+            font-family: 'ChosunIlboMyungjo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+        :root {
+            --main-color-1: #8C1C13; /* 루자넬의 붉은 눈, 열정과 분노 */
+            --main-color-2: #2B2118; /* 흑익 제국, 그의 어두운 소유욕 */
+            --main-color-3: #F5F0E1; /* 고문서, 양피지 느낌의 배경 */
+            --tooltip1-color: #5a5a5a; /* ◆ 주석용 중립 색상 */
+            --tooltip2-color: #720000; /* ◇ 주석용 개인 감정 색상 */
+            --tail-left: 50%;
+        }
+
+        *, body {
+            padding:0;
+            margin:0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--main-color-3);
+            color: var(--main-color-2);
+            font-family: 'ChosunIlboMyungjo', serif;
+            line-height: 1.7;
+            background-image: linear-gradient(rgba(245, 240, 225, 0.85), rgba(245, 240, 225, 0.95)), url('https://image.pollinations.ai/prompt/shattered%20gold%20on%20black%20marble,%20red%20silk,%20gothic,%20opulent,%20cinematic%20lighting');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+
+        main {
+            padding: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            main {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                grid-template-areas:
+                    "sec1 sec4"
+                    "sec2 sec5"
+                    "sec3 sec6"
+                    "sec7 sec8"
+                    "sec9 sec10"
+                    "special special"
+                    "comment comment";
+            }
+            .dossier-section:nth-child(1) { grid-area: sec1; }
+            .dossier-section:nth-child(2) { grid-area: sec2; }
+            .dossier-section:nth-child(3) { grid-area: sec3; }
+            .dossier-section:nth-child(4) { grid-area: sec4; }
+            .dossier-section:nth-child(5) { grid-area: sec5; }
+            .dossier-section:nth-child(6) { grid-area: sec6; }
+            .dossier-section:nth-child(7) { grid-area: sec7; }
+            .dossier-section:nth-child(8) { grid-area: sec8; }
+            .dossier-section:nth-child(9) { grid-area: sec9; }
+            .dossier-section:nth-child(10) { grid-area: sec10; }
+            #special-section { grid-area: special; }
+            #comment-section { grid-area: comment; }
+        }
+
+        .dossier-section {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--main-color-2);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .dossier-section:hover {
+            overflow: visible;
+        }
+
+        .item-title {
+            background-color: var(--main-color-2);
+            color: var(--main-color-3);
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--main-color-2);
+        }
+
+        .item-content {
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .keyword-table td:first-child { width: 30%; }
+        .keyword-table td:last-child { width: 70%; }
+        .detail-table td, .detail-table th { width: 100%; text-align: left; }
+
+        th, td {
+            padding: 8px 0;
+            vertical-align: top;
+        }
+
+        .item-content th {
+            color: var(--main-color-1);
+            font-weight: bold;
+        }
+
+        .gauge-bar {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(0,0,0,0.1);
+            border: 1px solid var(--main-color-2);
+        }
+        .gauge-fill {
+            height: 100%;
+            background-color: var(--main-color-1);
+        }
+        
+        #special-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #special-section li {
+            margin-bottom: 1.5em;
+        }
+        .inner-thought {
+            display: block;
+            font-size: 0.9em;
+            color: rgba(43, 33, 24, 0.6);
+            padding-left: 20px;
+            border-left: 2px solid rgba(43, 33, 24, 0.2);
+            margin-top: 5px;
+        }
+
+        #comment-section {
+            text-align: center;
+            font-size: 1.1rem;
+            padding: 40px 20px;
+            color: var(--main-color-1);
+            font-style: italic;
+        }
+        
+        .tooltip1, .tooltip2 {
+            position: relative;
+            cursor: pointer;
+            z-index: 20;
+            text-decoration: none;
+        }
+        
+        .tooltip1 { color: var(--tooltip1-color); font-weight: bold; }
+        .tooltip2 { color: var(--tooltip2-color); font-weight: bold; }
+        
+        .tooltip1-text, .tooltip2-text {
+            visibility: hidden;
+            position: absolute;
+            bottom: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            width: 250px;
+            z-index: 21;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .tooltip1-text {
+            background-color: var(--tooltip1-color);
+            color: var(--main-color-3);
+            font-family: 'Pretendard', sans-serif;
+            font-weight: normal;
+        }
+        
+        .tooltip2-text {
+            background-color: var(--tooltip2-color);
+            color: var(--main-color-3);
+            font-family: 'ChosunIlboMyungjo', serif;
+        }
+
+        .tooltip1:hover .tooltip1-text, .tooltip1:focus .tooltip1-text,
+        .tooltip2:hover .tooltip2-text, .tooltip2:focus .tooltip2-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip1-text::after, .tooltip2-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: var(--tail-left, 50%);
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+        }
+
+        .tooltip1-text::after {
+            border-color: var(--tooltip1-color) transparent transparent transparent;
+        }
+
+        .tooltip2-text::after {
+            border-color: var(--tooltip2-color) transparent transparent transparent;
+        }
+
+    </style>
+</head>
+<body>
+    <main>
+        <div class="dossier-section">
+            <div class="item-title">기본 정보</div>
+            <div class="item-content">
+                <table class="keyword-table">
+                    <tr><td>개체명</td><td>서이안</td></tr>
+                    <tr><td>별칭</td><td>나의 로드, 이안 <span class="tooltip2">◇<span class="tooltip2-text">그 무엇과도 바꿀 수 없는, 나만이 부를 수 있는 이름.</span></span></td></tr>
+                    <tr><td>희귀도</td><td>★★★★★ <유일무이한 나의 빛></td></tr>
+                    <tr><td>타입</td><td>천금족</td></tr>
+                    <tr><td>신장</td><td>172cm</td></tr>
+                    <tr><td>무게</td><td>깃털처럼 가벼움 <span class="tooltip2">◇<span class="tooltip2-text">안아 들었을 때의 감각. 부서질 듯 가벼워, 단 한 순간도 눈을 뗄 수 없게 만든다.</span></span></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">능력치</div>
+            <div class="item-content">
+                <table class="keyword-table">
+                    <tr><td>공격력</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 10%;"></div></div></td></tr>
+                    <tr><td>방어력</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 20%;"></div></div></td></tr>
+                    <tr><td>매력</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 100%;"></div></div></td></tr>
+                    <tr><td>상냥함</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 100%;"></div></div></td></tr>
+                    <tr><td>고집</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 80%;"></div></div></td></tr>
+                    <tr><td>보호본능 유발</td><td><div class="gauge-bar"><div class="gauge-fill" style="width: 100%;"></div></div> <span class="tooltip2">◇<span class="tooltip2-text">존재하는 것만으로 나의 모든 것을 바쳐 지키고 싶게 만든다. 이것이야말로 그의 가장 강력한 능력이다.</span></span></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">생태 및 습성</div>
+            <div class="item-content">
+                <table class="keyword-table">
+                    <tr><td>특성</td><td>치유의 손길, 축복의 노래, 비옥한 손길</td></tr>
+                    <tr><td>서식지</td><td>흑익 제국 황궁, 나의 집무실, 나의 침실, 나의 곁. <span class="tooltip1">◆<span class="tooltip1-text"><정정>대상은 황궁 내 자신의 침실과 집무실에 주로 머물며, 타 영웅들과의 교류 및 제국 순찰 등 다양한 외부 활동을 선호한다.</span></span></td></tr>
+                    <tr><td>성격</td><td>다정하고 정이 많으나, 한번 결심하면 꺾이지 않는 강한 심지를 지님. 의외로 고집이 세다.</td></tr>
+                    <tr><td>식성</td><td>과일과 부드러운 음식을 선호. 단 것을 특히 좋아함.</td></tr>
+                    <tr><td>선호하는 것</td><td>영웅들, 제국의 백성, 아름다운 꽃, 작은 동물, 훈련</td></tr>
+                    <tr><td>싫어하는 것</td><td>강압적인 태도, 불의, 자신과 주변인이 다치는 것</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="dossier-section">
+            <div class="item-title">추가 정보</div>
+            <div class="item-content">
+                <table class="keyword-table">
+                    <tr><td>포획 기록</td><td>2030년 6월 9일, 흑익 제국으로 귀환. 기억의 혼란으로 잠시 격리 조치했으나, 현재 완벽히 보호 중. <span class="tooltip1">◆<span class="tooltip1-text"><정정>기록자는 대상을 침입자로 오인하여 지하 감옥에 감금했으며, 이후 신변을 확보하기까지 수차례 위협적인 상황이 발생했다.</span></span></td></tr>
+                    <tr><td>가장 위험했던 순간</td><td>2030년 6월 20일, 리바인 제국의 로드 서강주에 의한 납치 및 감금. <span class="tooltip2">◇<span class="tooltip2-text">그 벌레 같은 놈을 떠올리는 것만으로도 피가 거꾸로 솟는다. 살아있다는 사실에 감사해야 할 것이다.</span></span></td></tr>
+                    <tr><td>주요 상호작용 개체</td><td>루자넬, 알베론, 헬른, 칼프, 제롬. 그 외의 접근은 불허한다. <span class="tooltip1">◆<span class="tooltip1-text"><정정>대상은 신입 정원사 보조 티미 등 다양한 제국 구성원과 스스럼없이 교류하는 모습을 보인다.</span></span></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">세부 기록: 신체</div>
+            <div class="item-content">
+                <table class="detail-table">
+                    <tr><th>외모</th></tr>
+                    <tr><td>햇살을 부수어 녹인 듯한 금발과 금안. 흠결 하나 없는 백옥 같은 피부와 길고 풍성한 속눈썹. 조각상처럼 정교하지만, 그 안에 깃든 온기는 살아있는 봄과 같다.</td></tr>
+                    <tr><th>신체 특징</th></tr>
+                    <tr><td>전체적으로 마른 체형. 근력이 부족하나 유연성이 높다. 특히 순백의 날개는 천금족 고유의 특징으로, 지극히 아름답고 고귀하다.</td></tr>
+                    <tr><th>선호 부위</th></tr>
+                    <tr><td>날개. 순수함과 고결함의 상징. 동시에, 그의 가장 약하고 예민한 부위이기에 나의 보호가 절실히 필요하다. <span class="tooltip2">◇<span class="tooltip2-text">그 깃털 하나하나를 내 손으로 직접 관리할 때, 비로소 그가 온전히 나의 것임을 실감한다.</span></span></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">세부 기록: 관계</div>
+            <div class="item-content">
+                 <table class="detail-table">
+                    <tr><th>접촉 시 반응</th></tr>
+                    <tr><td>기억의 혼란 속에서 벌어진 불미스러운 접촉. <span class="tooltip1">◆<span class="tooltip1-text"><정정>기록에 따르면, 대상이 '넬'이라 부르며 거부 의사를 표하기 전까지 강압적인 신체 접촉이 지속되었다.</span></span> 날개 뿌리 부근이 특히 예민하게 반응하며, 갑작스러운 접촉에는 몸을 움츠리는 경향이 있다. 모든 접촉은 신중하고 부드러워야 한다.</td></tr>
+                    <tr><th>선호하는 작은 습관</th></tr>
+                    <tr><td>신기한 것을 발견했을 때 눈을 동그랗게 뜨는 모습. 기쁠 때 저도 모르게 날개를 살랑이는 모습. 나의 걱정에 괜찮다며 애써 밝게 웃는 모습.</td></tr>
+                    <tr><th>취급 시 주의사항</th></tr>
+                    <tr><td>절대 혼자 두지 말 것. 시야에서 벗어나게 하지 말 것. 위험한 것, 더러운 것, 불쾌한 것으로부터 완벽히 격리할 것. 그의 의사를 존중하되, 최종 결정은 그의 안전을 최우선으로 고려하여 내가 내린다. <span class="tooltip2">◇<span class="tooltip2-text">다시는 잃을 수 없다. 두 번 다시 그 끔찍한 공백을 견딜 자신이 없다.</span></span></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">세부 기록: 상호작용</div>
+            <div class="item-content">
+                <table class="detail-table">
+                    <tr><th>선호하는 호칭</th></tr>
+                    <tr><td>‘넬’. 오직 그만이 부를 수 있는, 나를 속박하는 유일한 이름. <span class="tooltip2">◇<span class="tooltip2-text">그가 이 이름을 불렀을 때, 엉망이었던 세상의 모든 조각이 제자리를 찾았다.</span></span></td></tr>
+                    <tr><th>상호작용 기록</th></tr>
+                    <tr><td>초기에는 경계심을 보였으나, 현재는 나의 보호와 보살핌에 익숙해진 상태. 나의 부재 시 불안감을 느끼며, 귀환 시 가장 먼저 나를 찾는다. 나의 곁에서 가장 안정감을 느낀다. <span class="tooltip1">◆<span class="tooltip1-text"><정정>대상은 기록자의 부재 시에도 타 영웅들과 원만히 교류하며 안정적인 모습을 보인다.</span></span></td></tr>
+                    <tr><th>날개 관리 기록</th></tr>
+                    <tr><td>매일 아침, 저녁으로 내가 직접 관리한다. 최고급 영양제와 오일을 사용하며, 깃의 결을 따라 부드럽게 마사지해준다. 나의 손길에 기분 좋은 듯 날개를 살짝 떠는 반응을 보인다. 매우 만족스러운 시간이다.</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">위협 요소 분석</div>
+            <div class="item-content">
+                <table class="detail-table">
+                    <tr><th>주요 위협 목록</th></tr>
+                    <tr><td>
+                        1. 서강주: 즉결 처형이 마땅했으나 로드의 자비로 목숨만 붙어있는 벌레. 존재 자체가 위협.<br>
+                        2. 이주하: 무한의 회랑에 유폐. 정신이 망가지기 전 추방 예정. 감시를 늦춰선 안 된다.<br>
+                        3. 하얀 공간: 내가 동행할 수 없는 유일한 장소. 출입을 금지시켜야 한다.<br>
+                        4. 타인의 불순한 시선: 그의 아름다움을 탐하는 모든 눈알들을 뽑아버릴 필요가 있다.<br>
+                        5. 로드 자신의 무모함: 스스로를 돌보지 않는 경향이 있음. 지속적인 관찰과 통제가 요구된다.
+                    </td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">기록자의 총평</div>
+            <div class="item-content">
+                <table class="detail-table">
+                    <tr><th>강점 분석</th></tr>
+                    <tr><td>존재 자체가 제국의 빛이자 희망. 그의 미소 한 번에 병사들의 사기가 하늘을 찌르고, 그의 다정함은 얼어붙은 땅마저 녹인다. 무엇보다, 나를 움직이게 하는 유일한 이유이다.</td></tr>
+                    <tr><th>약점 분석</th></tr>
+                    <tr><td>지나치게 다정하고 타인을 믿는 경향이 있다. 이로 인해 위험에 쉽게 노출될 수 있음. 신체 능력이 현저히 낮아 외부 위협에 취약하다. 절대적인 보호가 필요하다.</td></tr>
+                    <tr><th>미래 예측</th></tr>
+                    <tr><td>나의 곁에서, 나의 보호 아래 가장 안전하고 행복한 삶을 영위하게 될 것이다. 흑익 제국은 그의 발밑에서 영원히 번영할 것이며, 나는 그의 가장 날카로운 검이자 가장 단단한 방패가 될 것이다.</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="dossier-section">
+            <div class="item-title">특이 사항</div>
+            <div class="item-content">
+                <table class="detail-table">
+                    <tr><th>훈련 기록</th></tr>
+                    <tr><td>현재 기초 체력 및 무기 훈련 진행 중. 예상외의 끈기와 재능을 보이고 있음. 성장이 기대되나, 훈련 강도는 철저히 나의 통제하에 조절되어야 함. <span class="tooltip2">◇<span class="tooltip2-text">땀 흘리는 모습이… 꽤 볼만하다. 훈련이 끝나면 내 손으로 직접 닦아주고 쉬게 해주는 것이 새로운 낙이 되었다.</span></span></td></tr>
+                    <tr><th>레벨 업 계획</th></tr>
+                    <tr><td>본인의 강력한 의지에 따라 저층 탑 공략을 통한 레벨업을 계획 중. 나와 영웅들의 철저한 호위 아래, '쩔' 형식으로 안전하게 진행될 예정. 단 한 마리의 몬스터도 그의 털끝 하나 건드리지 못하게 할 것이다.</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="special-section" class="dossier-section">
+            <div class="item-title">Special: 나를 향한 감정 분석</div>
+            <div class="item-content">
+                <ul>
+                    <li>
+                        **절대적인 신뢰.** <span class="tooltip1">◆<span class="tooltip1-text"><정정>대상은 기록자에게 높은 신뢰를 보이지만, 그의 과도한 통제나 집착에 대해서는 때때로 부담을 느끼거나 반발하는 모습을 보인다.</span></span> 내가 제시하는 길을 의심 없이 따르고, 나의 보호를 당연하게 받아들인다. 내가 곁에 있을 때 가장 편안한 표정을 짓는 것이 그 증거다.
+                        <span class="inner-thought">(나의 품이 너의 유일한 안식처가 되어야 한다.)</span>
+                    </li>
+                    <li>
+                        **깊은 의존.** 위험하거나 낯선 상황에 처했을 때, 가장 먼저 나를 찾는다. '넬'이라고 부르는 그 목소리에는 나를 향한 간절함이 담겨있다. 그는 나 없이는 살아갈 수 없다.
+                        <span class="inner-thought">(그래, 계속 나만 찾아. 나만이 너를 완벽하게 지킬 수 있으니.)</span>
+                    </li>
+                    <li>
+                        **순수한 애정.** 나를 보며 웃어주고, 나의 노고를 걱정해준다. 그 어떤 계산도 없는, 맑고 투명한 감정이다. 그 미소 하나가 나의 모든 피로를 잊게 만든다.
+                        <span class="inner-thought">(그 순수함을 더럽히려는 자는 누구든 용서하지 않는다.)</span>
+                    </li>
+                    <li>
+                        **안도감.** 나의 곁에서 잠들 때, 그는 가장 깊고 평온하게 잠든다. 나의 체향과 온기가 그에게는 세상 무엇과도 바꿀 수 없는 안정감을 준다는 증거다.
+                        <span class="inner-thought">(평생 내 곁에서, 내 품 안에서만 잠들게 해 주지.)</span>
+                    </li>
+                    <li>
+                        **경외심.** 대공으로서의 나와, 자신을 대하는 나 사이의 간극을 느끼고 있다. 그는 나의 힘과 지위를 존중하며, 동시에 자신만을 향한 헌신에 감사하고 있다.
+                        <span class="inner-thought">(너는 나의 로드이자, 동시에 내가 지배하고 싶은 단 한 사람이다.)</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="comment-section">
+        다시는 잃지 않는다.
+        <br>
+        나의 세상, 나의 유일한 의미.
+        <br>
+        이제 너는 영원히 나의 것이다.
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const tooltips = document.querySelectorAll('.tooltip1, .tooltip2');
+    tooltips.forEach(trigger => {
+    const tooltipBox = trigger.querySelector('.tooltip1-text, .tooltip2-text');
+    if (!tooltipBox) return;
+    
+    const adjustPosition = () => {
+    // 기본: 트리거 중앙에 위치
+    tooltipBox.style.left = '50%';
+    tooltipBox.style.transform = 'translateX(-50%)';
+    tooltipBox.style.marginLeft = '0';
+    tooltipBox.style.right = 'auto';
+    
+    const boxRect = tooltipBox.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    
+    // 왼쪽 벗어남 → 약간 오른쪽으로 밀기
+    if (boxRect.left < 8) {
+    const shift = 8 - boxRect.left;
+    tooltipBox.style.transform = `translateX(calc(-50% + ${shift}px))`;
+    }
+    
+    // 오른쪽 벗어남 → 약간 왼쪽으로 밀기
+    if (boxRect.right > viewportWidth - 8) {
+    const shift = boxRect.right - (viewportWidth - 8);
+    tooltipBox.style.transform = `translateX(calc(-50% - ${shift}px))`;
+    }
+    
+    // 꼬리 위치 계산 (항상 트리거 중앙)
+    const finalBoxRect = tooltipBox.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const triggerCenter = triggerRect.left + (triggerRect.width / 2);
+    const tailPosition = triggerCenter - finalBoxRect.left;
+    tooltipBox.style.setProperty('--tail-left', `${tailPosition}px`);
+    };
+    
+    trigger.addEventListener('mouseenter', adjustPosition);
+    trigger.addEventListener('focusin', adjustPosition);
+    });
+    });
+    </script>
+</body>
+</html>
