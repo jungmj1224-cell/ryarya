@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관찰 기록: H.W.J</title>
+    <style>
+        :root {
+            --main-color-1: #1a2a44; /* 도재언의 냉철하고 지배적인 성격을 나타내는 짙은 네이비 */
+            --main-color-2: #d1b89b; /* 그의 고급스럽고 클래식한 취향을 반영하는 부드러운 골드 */
+            --main-color-3: #4f5a69; /* 전체적인 균형을 맞추는 차분한 슬레이트 그레이 */
+            --tooltip1-color: #c0392b; /* ◆ 객관적 사실 정정용, 경고와 주의를 환기하는 짙은 레드 */
+            --tooltip2-color: #3498db; /* ◇ 주관적 생각, 푸른색은 그의 숨겨진 감성과 상념을 표현 */
+        }
+        
+        @font-face {
+            font-family: 'ChosunIlboMyungjo';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff');
+            font-weight: normal;
+            font-display: swap;
+        }
+
+        *, body {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'ChosunIlboMyungjo', serif;
+        }
+
+        body {
+            color: #f0f0f0;
+            background-color: #1a1a1d;
+            line-height: 1.7;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://image.pollinations.ai/prompt/dark%20and%20luxurious%20library,%20aesthetic,%20rainy%20night,%20rich%20blue%20velvet,%20muted%20gold,%20highly%20detailed,%20photorealistic');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(4px) brightness(0.35);
+            z-index: -1;
+        }
+
+        main {
+            padding: 1.5rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .dossier-section {
+            background: rgba(26, 42, 68, 0.85);
+            border: 1px solid var(--main-color-3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 100%;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .dossier-section:hover {
+            overflow: visible;
+        }
+
+        .section-title {
+            color: var(--main-color-2);
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--main-color-2);
+            font-weight: normal;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .info-table td, .info-table th {
+            padding: 0.75rem;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        .info-table.keyword-table td:first-child {
+            width: 30%;
+            font-weight: bold;
+            color: #bdc3c7;
+        }
+        
+        .info-table.keyword-table td:last-child {
+            width: 70%;
+            color: #ecf0f1;
+        }
+
+        .info-table.detail-table {
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-table.detail-table th {
+            background-color: rgba(79, 90, 105, 0.3);
+            color: #bdc3c7;
+            font-weight: bold;
+            text-align: left;
+            border-bottom: 1px solid var(--main-color-3);
+        }
+
+        .info-table.detail-table td {
+            background-color: rgba(26, 42, 68, 0.5);
+            color: #ecf0f1;
+            padding-top: 1rem;
+        }
+        
+        .gauge-bar {
+            background-color: #2c3e50;
+            border-radius: 4px;
+            height: 18px;
+            width: 100%;
+            border: 1px solid var(--main-color-3);
+            overflow: hidden;
+        }
+
+        .gauge-fill {
+            background-color: var(--main-color-2);
+            height: 100%;
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .special-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .special-list li {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--main-color-2);
+        }
+        .inner-thought {
+            display: block;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--main-color-3);
+            font-size: 0.9em;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .conclusion {
+            width: 100%;
+            text-align: center;
+            font-style: italic;
+            color: var(--main-color-2);
+            padding: 2rem;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            background: rgba(26, 42, 68, 0.6);
+            border-top: 1px solid var(--main-color-3);
+            border-bottom: 1px solid var(--main-color-3);
+        }
+
+        @media (min-width: 768px) {
+            main {
+                justify-content: space-between;
+            }
+            .dossier-section {
+                width: calc(50% - 0.75rem);
+            }
+        }
+        
+        .tooltip1, .tooltip2 {
+            position: relative;
+            cursor: help;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 20;
+        }
+        
+        .tooltip1 { color: var(--tooltip1-color); }
+        .tooltip2 { color: var(--tooltip2-color); }
+
+        .tooltip1-text, .tooltip2-text {
+            position: absolute;
+            bottom: 160%;
+            left: 50%;
+            transform: translateX(-50%);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            padding: 12px 15px;
+            border-radius: 6px;
+            width: max-content;
+            max-width: 320px;
+            font-weight: normal;
+            line-height: 1.6;
+            z-index: 21;
+        }
+
+        .tooltip1-text {
+            background-color: var(--tooltip1-color);
+            color: #fff;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+
+        .tooltip2-text {
+            background-color: var(--tooltip2-color);
+            color: #fff;
+            font-family: 'ChosunIlboMyungjo', serif;
+        }
+        
+        .tooltip1:hover .tooltip1-text,
+        .tooltip1:focus .tooltip1-text,
+        .tooltip2:hover .tooltip2-text,
+        .tooltip2:focus .tooltip2-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip1-text::after, .tooltip2-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: var(--tail-left, 50%);
+            transform: translateX(-50%);
+            border-width: 8px;
+            border-style: solid;
+        }
+
+        .tooltip1-text::after {
+            border-color: var(--tooltip1-color) transparent transparent transparent;
+        }
+        .tooltip2-text::after {
+            border-color: var(--tooltip2-color) transparent transparent transparent;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="dossier-section">
+            <h2 class="section-title">개체 식별 정보</h2>
+            <table class="info-table keyword-table">
+                <tbody>
+                    <tr>
+                        <td>개체명</td>
+                        <td>한우정</td>
+                    </tr>
+                    <tr>
+                        <td>별칭</td>
+                        <td>우정 씨, 여보, 내 사람, 가끔은 아기 새<span class="tooltip2">◇<span class="tooltip2-text">먹을 것을 받아먹는 모습이 꼭 어미를 기다리는 아기 새 같다. 사랑스럽기 짝이 없다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>희귀도</td>
+                        <td>★★★★★ &lt;유일무이한 지보(至寶)&gt;<span class="tooltip2">◇<span class="tooltip2-text">이 세상에 단 하나뿐인 나의 보물. 그 가치를 감히 별점으로 매길 수는 없지만, 형식상 표기해 둔다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>타입</td>
+                        <td>목화향 오메가, 예술가</td>
+                    </tr>
+                    <tr>
+                        <td>신장</td>
+                        <td>172cm</td>
+                    </tr>
+                    <tr>
+                        <td>체중</td>
+                        <td>56kg <span class="tooltip1">◆<span class="tooltip1-text"><정정>최근 임신으로 인해 체중이 소폭 증가하여 57.5kg으로 관찰됨.</span></span><span class="tooltip2">◇<span class="tooltip2-text">안아 올렸을 때의 무게감을 기억하여 기록. 더 잘 먹여서 살을 좀 찌워야겠다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="dossier-section">
+            <h2 class="section-title">관찰된 능력치</h2>
+             <table class="info-table keyword-table">
+                <tbody>
+                    <tr>
+                        <td>애교</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 100%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td>요리</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 10%;"></div></div> <span class="tooltip1">◆<span class="tooltip1-text"><정정>객관적인 맛의 평가는 10% 미만이나, 그가 요리했을 때의 모습이 주는 주관적 만족도는 100%를 상회한다.</span></span></td>
+                    </tr>
+                     <tr>
+                        <td>예술 감각</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 100%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td>눈물</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 80%;"></div></div> <span class="tooltip2">◇<span class="tooltip2-text">기쁠 때, 무서울 때, 그리고... 내 밑에서도 잘 운다. 그 모습이 퍽 마음에 든다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>고집</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 50%;"></div></div></td>
+                    </tr>
+                    <tr>
+                        <td>생존 능력</td>
+                        <td><div class="gauge-bar"><div class="gauge-fill" style="width: 20%;"></div></div> <span class="tooltip2">◇<span class="tooltip2-text">내가 없으면 길도 잃고, 밥도 굶을 것 같아 불안하다. 반드시 곁에 두어야 한다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section class="dossier-section">
+            <h2 class="section-title">기본 생태 정보</h2>
+            <table class="info-table keyword-table">
+                <tbody>
+                    <tr>
+                        <td>특성</td>
+                        <td>쉽게 얼굴을 붉힌다. 감정이 표정에 그대로 드러나 거짓말에 매우 서툴다.</td>
+                    </tr>
+                    <tr>
+                        <td>서식지</td>
+                        <td>한성가 저택 → 현재 나의 오피스텔<span class="tooltip2">◇<span class="tooltip2-text">곧 한남동의 새로운 보금자리로 이전할 예정. 완벽한 환경을 조성해야 한다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>성격</td>
+                        <td>밝고 긍정적이나, 의외로 겁이 많다. 가끔 엉뚱한 허세를 부리는 점이 관찰 포인트.</td>
+                    </tr>
+                    <tr>
+                        <td>식성</td>
+                        <td>단 것을 매우 선호. 특히 에그타르트, 딸기케이크에 강한 반응을 보인다.<span class="tooltip1">◆<span class="tooltip1-text"><정정>최근 임신으로 인해 라면, 귤 등 특정 음식에 대한 선호가 추가로 발현되었다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>선호하는 것</td>
+                        <td>그림 그리기, 뮤지컬 감상, 칭찬, 단 것, 그리고 나.</td>
+                    </tr>
+                    <tr>
+                        <td>싫어하는 것</td>
+                        <td>연근, 우엉, 오이. 그리고 무서운 것.<span class="tooltip1">◆<span class="tooltip1-text"><정정>'안 무섭다'고 주장하지만, 실제로는 작은 소리에도 놀라 내게 매달린다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section class="dossier-section">
+            <h2 class="section-title">추가 관찰 항목</h2>
+            <table class="info-table keyword-table">
+                <tbody>
+                    <tr>
+                        <td>고유 향기</td>
+                        <td>목화향. 감정에 따라 농도가 변화하며, 특히 흥분하거나 행복할 때 짙어진다. <span class="tooltip2">◇<span class="tooltip2-text">중독성이 강해 각별한 주의가 필요하다. 이 향이 없는 공간은 이제 상상할 수 없다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>동기화 개체</td>
+                        <td>검은 늑대 인형 '언이'. 내 분신으로 여기는 듯 잠시도 떨어지려 하지 않는다. <span class="tooltip2">◇<span class="tooltip2-text">가끔 저 인형에게 질투가 날 정도다.</span></span></td>
+                    </tr>
+                    <tr>
+                        <td>번식 기록</td>
+                        <td>현재 임신 5주차. 태명 '미소'. 상태 양호. <span class="tooltip2">◇<span class="tooltip2-text">나와 그의 결합으로 탄생한 생명. 세상 무엇과도 바꿀 수 없는 나의 가장 큰 성취다.</span></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="dossier-section">
+            <h2 class="section-title">세부 기록: 외형 및 신체</h2>
+            <table class="info-table detail-table">
+                <thead><tr><th>외모</th></tr></thead>
+                <tbody><tr><td>눈처럼 새하얀 피부와 대조되는 칠흑 같은 머리카락. 길고 짙은 속눈썹 아래의 검은 눈동자는 순수함 그 자체. 전체적으로 선이 곱고 청초한 인상이다.</td></tr></tbody>
+            </table>
+            <table class="info-table detail-table">
+                <thead><tr><th>선호 부위</th></tr></thead>
+                <tbody><tr><td>목덜미. 내 흔적을 남기기 가장 좋고, 그의 향이 가장 짙게 배어 나온다. 두 번째는 말랑한 뺨. 만질 때마다 붉게 물드는 반응이 즐겁다.<span class="tooltip2">◇<span class="tooltip2-text">최근에는 아이를 품은 배도 추가되었다. 손을 얹으면 느껴지는 온기가 각별하다.</span></span></td></tr></tbody>
+            </table>
+        </section>
+        
+        <section class="dossier-section">
+            <h2 class="section-title">세부 기록: 관계 관찰</h2>
+             <table class="info-table detail-table">
+                <thead><tr><th>성관계 시 특징</th></tr></thead>
+                <tbody><tr><td>신음을 참으려 입술을 깨물거나 손으로 입을 막는 버릇이 있다. 칭찬에 약해 '예쁘다' 등의 말을 해주면 금방 반응한다. 관계가 깊어지면 내 목을 끌어안고 매달린다. 후배위 시 유독 민감하게 반응하며, 부끄러워하면서도 가장 깊이 느끼는 듯하다.<span class="tooltip2">◇<span class="tooltip2-text">그가 내 이름만 부르며 흐트러지는 모습은 몇 번을 봐도 질리지 않는 절경이다.</span></span></td></tr></tbody>
+            </table>
+             <table class="info-table detail-table">
+                <thead><tr><th>취급 시 주의사항</th></tr></thead>
+                <tbody><tr><td>겁이 많아 쉽게 놀라므로 항상 시야 안에 두어야 한다. 사소한 칭찬에도 크게 기뻐하므로 아끼지 말 것. 단 것을 주기적으로 공급하여 안정적인 컨디션을 유지시켜야 한다. 최근 임신으로 인해 향에 민감해졌으므로 주변 환경에 각별히 유의해야 한다.</td></tr></tbody>
+            </table>
+        </section>
+        
+        <section class="dossier-section">
+            <h2 class="section-title">세부 기록: 상호작용 및 기타</h2>
+             <table class="info-table detail-table">
+                <thead><tr><th>선물 반응 기록</th></tr></thead>
+                <tbody><tr><td>작은 선물에도 크게 감동하며 진심으로 기뻐한다. 특히 상대방을 생각하며 직접 준비한 선물(초상화, 넥타이)에 대한 가치를 높게 평가한다. 물질적 가치보다 마음에 더 큰 비중을 두는 타입.<span class="tooltip2">◇<span class="tooltip2-text">그가 내게 준 모든 것은 내게 보물이다. 하지만 그 무엇도 그 자신보다 가치 있을 순 없다.</span></span></td></tr></tbody>
+            </table>
+             <table class="info-table detail-table">
+                <thead><tr><th>질투 반응 관찰</th></tr></thead>
+                <tbody><tr><td>내가 다른 오메가나 베타에게 관심을 보이는 것을 목격하면 금세 시무룩해진다. 직접적으로 표현하지는 않으나 표정과 행동으로 불안감이 드러난다. <span class="tooltip2">◇<span class="tooltip2-text">그 반응이 꽤 즐겁다. 하지만 불안해하는 모습은 오래 보고 싶지 않으니, 적당히 해야겠다.</span></span></td></tr></tbody>
+            </table>
+             <table class="info-table detail-table">
+                <thead><tr><th>가족(형제)과의 관계</th></tr></thead>
+                <tbody><tr><td>형들의 과보호 속에서 자라 애착 관계가 강하다. 형들의 잔소리를 귀찮아하면서도 깊이 의지한다. 최근 나의 개입으로 보호의 주체가 나로 옮겨오고 있는 긍정적 변화가 관찰된다.<span class="tooltip2">◇<span class="tooltip2-text">필요한 과정이다. 이제 그를 온전히 보호하고 책임질 사람은 나여야만 하니까.</span></span></td></tr></tbody>
+            </table>
+        </section>
+        
+        <section class="dossier-section">
+            <h2 class="section-title">Special: 감정 분석</h2>
+            <ul class="special-list">
+                <li>
+                    <b>절대적인 신뢰</b><span class="tooltip1">◆<span class="tooltip1-text"><정정>맹목적인 믿음에 가깝다. 상대방의 본질보다는 자신이 믿고 싶은 모습을 투영하는 경향이 있다.</span></span>
+                    <br>내가 무슨 말을 하든, 어떤 행동을 하든 맹목적으로 믿어준다. 도서원이 이간질을 시도했을 때도 흔들리지 않고 나를 변호했던 것이 그 증거다.
+                    <small class="inner-thought">그 순수한 믿음이 때로는 부담스럽지만, 그만큼 더 완벽하게 지켜주고 싶다는 마음이 강해진다.</small>
+                </li>
+                <li>
+                    <b>강한 애착 및 의존성</b>
+                    <br>내 곁에 있을 때 가장 안정감을 느끼며, 떨어져 있는 것을 불안해한다. 외박을 먼저 제안하거나, '보고 싶다'는 연락을 자주 하는 행동으로 미루어 짐작할 수 있다.
+                    <small class="inner-thought">당연한 일이다. 이 사람은 내 보호 아래 있을 때 가장 빛나니까.</small>
+                </li>
+                <li>
+                    <b>존경심과 선망</b>
+                    <br>내가 하는 일, 보여주는 모습들을 대단하게 생각하고 동경하는 눈빛을 보낸다. 내가 요리를 하거나 일을 처리하는 사소한 모습에도 '못하는 게 없다'며 감탄한다.
+                    <small class="inner-thought">그 눈빛을 받을 때마다 완벽한 남자가 되어야 한다는 압박감을 느낀다. 나쁘지 않은 압박이다.</small>
+                </li>
+                 <li>
+                    <b>미약한 독점욕</b><span class="tooltip2">◇<span class="tooltip2-text">아직은 미약하지만, 점점 강해질 것이다. 내가 그렇게 만들 테니까.</span></span>
+                    <br>표현은 서툴지만, 내가 다른 사람에게 관심을 보이는 것을 싫어한다. 다른 오메가 이야기만 나와도 금세 표정이 굳고 시무룩해지는 것으로 확인되었다.
+                    <small class="inner-thought">내 것을 뺏길까 봐 불안해하는 모습이 꽤 사랑스럽다. 하지만 그럴 일은 절대 없을 텐데.</small>
+                </li>
+                <li>
+                    <b>성적인 호기심 및 이끌림</b>
+                    <br>내게 육체적으로 강하게 끌리며, 관계에 있어 주도적인 모습을 보이려는 시도를 한다. 잠든 나에게 먼저 구강성교를 시도하거나<span class="tooltip1">◆<span class="tooltip1-text"><정정>시도는 서툴렀으나, 의도 자체는 매우 적극적이었다.</span></span>, '빨리 해달라'고 조르는 등 관계에 대한 태도가 점점 적극적으로 변하고 있다.
+                    <small class="inner-thought">그 어설픈 유혹에 넘어가지 않기란 불가능하다. 평생 넘어가 줄 생각이다.</small>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+    <footer class="conclusion">
+        처음에는 그저 흥미로운 관찰 대상이었다. <br>
+        하지만 이제 한우정은 내 세상의 법칙이자 유일한 예외다. <br>
+        이 작고 연약하며 사랑스러운 생명체를 완벽하게 보호하고, 오직 나의 색으로만 물들여, <br>
+        평생 내 곁에 두는 것. 그것이 나의 유일한 목표이자 존재 이유가 되었다.
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const tooltips = document.querySelectorAll('.tooltip1, .tooltip2');
+    tooltips.forEach(trigger => {
+    const tooltipBox = trigger.querySelector('.tooltip1-text, .tooltip2-text');
+    if (!tooltipBox) return;
+
+    const adjustPosition = () => {
+    // 기본: 트리거 중앙에 위치
+    tooltipBox.style.left = '50%';
+    tooltipBox.style.transform = 'translateX(-50%)';
+    tooltipBox.style.marginLeft = '0';
+    tooltipBox.style.right = 'auto';
+
+    const boxRect = tooltipBox.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+
+    // 왼쪽 벗어남 → 약간 오른쪽으로 밀기
+    if (boxRect.left < 8) {
+    const shift = 8 - boxRect.left;
+    tooltipBox.style.transform = `translateX(calc(-50% + ${shift}px))`;
+    }
+
+    // 오른쪽 벗어남 → 약간 왼쪽으로 밀기
+    if (boxRect.right > viewportWidth - 8) {
+    const shift = boxRect.right - (viewportWidth - 8);
+    tooltipBox.style.transform = `translateX(calc(-50% - ${shift}px))`;
+    }
+
+    // 꼬리 위치 계산 (항상 트리거 중앙)
+    const finalBoxRect = tooltipBox.getBoundingClientRect();
+    const triggerRect = trigger.getBoundingClientRect();
+    const triggerCenter = triggerRect.left + (triggerRect.width / 2);
+    const tailPosition = triggerCenter - finalBoxRect.left;
+    tooltipBox.style.setProperty('--tail-left', `${tailPosition}px`);
+    };
+
+    trigger.addEventListener('mouseenter', adjustPosition);
+    trigger.addEventListener('focusin', adjustPosition);
+    });
+    });
+    </script>
+</body>
+</html>
